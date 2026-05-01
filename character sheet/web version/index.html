@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Character Sheet</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="toolbar">
+    <span class="toolbar-title">Character Sheet</span>
+    <div class="toolbar-center">
+      <button class="btn btn-rest" id="rest-btn">Rest</button>
+      <button class="btn btn-sleep" id="sleep-btn">Sleep</button>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-primary" id="export-btn">Save Character</button>
+      <button class="btn" id="import-btn">Import Character</button>
+      <input type="file" id="import-file" accept=".json" style="display:none">
+    </div>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- IDENTITY -->
+    <section class="card">
+      <div class="card-header">Identity</div>
+      <div class="identity-row">
+        <div class="field field-grow">
+          <label for="char-name">Character Name</label>
+          <input type="text" id="char-name" placeholder="Character name">
+        </div>
+        <div class="field field-grow">
+          <label for="player-name">Player Name</label>
+          <input type="text" id="player-name" placeholder="Your name">
+        </div>
+        <div class="field field-grow">
+          <label for="species">Species</label>
+          <input type="text" id="species" placeholder="Species">
+        </div>
+        <div class="field field-sm">
+          <label for="level">Level</label>
+          <input type="number" id="level" value="1" min="1">
+        </div>
+        <div class="field field-grow">
+          <label for="class-name">Class</label>
+          <input type="text" id="class-name" placeholder="Class name">
+        </div>
+      </div>
+    </section>
+
+    <div class="concept-traits-layout">
+
+    <!-- LEFT COLUMN: Concept + Class Modifiers -->
+    <div class="left-col">
+
+    <!-- CHARACTER CONCEPT -->
+    <section class="card">
+      <div class="card-header">Character Concept</div>
+      <div class="concept-row">
+        <div class="field">
+          <label for="origin-story">Origin Story</label>
+          <textarea id="origin-story" rows="4" placeholder="Who are you at level 1?"></textarea>
+        </div>
+        <div class="field">
+          <label for="reason-adventuring">Reason for Adventuring</label>
+          <textarea id="reason-adventuring" rows="4" placeholder="Why do you adventure?"></textarea>
+        </div>
+        <div class="field">
+          <label for="ultimate-fantasy">Ultimate Fantasy</label>
+          <textarea id="ultimate-fantasy" rows="4" placeholder="Who do you want to be at the end?"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLASS MODIFIERS -->
+    <section class="card">
+      <div class="card-header">Class Modifiers</div>
+      <div class="class-modifiers">
+        <div class="class-mod-row">
+          <span class="class-mod-num">1</span>
+          <select id="class-mod-1-type" class="class-mod-select">
+            <option value="">— Select —</option>
+            <option>Movement Speed</option>
+            <option>Physical Damage Mitigation</option>
+            <option>Mental Damage Mitigation</option>
+            <option>Physical Damage</option>
+            <option>Magical Damage</option>
+            <option>Attack Bonus</option>
+            <option>Resolve</option>
+            <option>Resonance</option>
+            <option>Additional Specialization</option>
+            <option>Weapon Training</option>
+            <option>Armor Training</option>
+            <option>Charm Training</option>
+            <option>Shield Training</option>
+          </select>
+          <input type="text" id="class-mod-1-detail" class="class-mod-detail" placeholder="Details (e.g. Weapon Training — melee, standard)">
+        </div>
+        <div class="class-mod-row">
+          <span class="class-mod-num">2</span>
+          <select id="class-mod-2-type" class="class-mod-select">
+            <option value="">— Select —</option>
+            <option>Movement Speed</option>
+            <option>Physical Damage Mitigation</option>
+            <option>Mental Damage Mitigation</option>
+            <option>Physical Damage</option>
+            <option>Magical Damage</option>
+            <option>Attack Bonus</option>
+            <option>Resolve</option>
+            <option>Resonance</option>
+            <option>Additional Specialization</option>
+            <option>Weapon Training</option>
+            <option>Armor Training</option>
+            <option>Charm Training</option>
+            <option>Shield Training</option>
+          </select>
+          <input type="text" id="class-mod-2-detail" class="class-mod-detail" placeholder="Details">
+        </div>
+        <div class="class-mod-row">
+          <span class="class-mod-num">3</span>
+          <select id="class-mod-3-type" class="class-mod-select">
+            <option value="">— Select —</option>
+            <option>Movement Speed</option>
+            <option>Physical Damage Mitigation</option>
+            <option>Mental Damage Mitigation</option>
+            <option>Physical Damage</option>
+            <option>Magical Damage</option>
+            <option>Attack Bonus</option>
+            <option>Resolve</option>
+            <option>Resonance</option>
+            <option>Additional Specialization</option>
+            <option>Weapon Training</option>
+            <option>Armor Training</option>
+            <option>Charm Training</option>
+            <option>Shield Training</option>
+          </select>
+          <input type="text" id="class-mod-3-detail" class="class-mod-detail" placeholder="Details">
+        </div>
+      </div>
+    </section>
+
+    <!-- SPECIALIZATIONS -->
+    <section class="card">
+      <div class="card-header">
+        <span>Specializations</span>
+        <button class="add-btn" id="add-spec-btn">+ Add</button>
+      </div>
+      <div id="spec-list"></div>
+      <p class="empty-message" id="spec-empty">No specializations added yet.</p>
+    </section>
+
+    </div><!-- /left-col -->
+
+    <!-- TRAITS + DERIVED STATS -->
+    <section class="card">
+      <div class="card-header">Traits &amp; Derived Stats</div>
+      <div class="traits-derived-layout">
+
+        <div class="traits-grid">
+
+          <div class="traits-col">
+            <div class="trait-col-headers">
+              <span></span>
+              <span>Value</span>
+              <span>Die</span>
+            </div>
+            <div class="trait-group">
+              <div class="trait-row">
+                <span class="trait-name">Strength</span>
+                <input type="number" id="trait-strength-val" class="trait-val" value="0" min="0">
+                <select id="trait-strength-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Speed</span>
+                <input type="number" id="trait-speed-val" class="trait-val" value="0" min="0">
+                <select id="trait-speed-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Finesse</span>
+                <input type="number" id="trait-finesse-val" class="trait-val" value="0" min="0">
+                <select id="trait-finesse-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="trait-group">
+              <div class="trait-row">
+                <span class="trait-name">Endurance</span>
+                <input type="number" id="trait-endurance-val" class="trait-val" value="0" min="0">
+                <select id="trait-endurance-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Balance</span>
+                <input type="number" id="trait-balance-val" class="trait-val" value="0" min="0">
+                <select id="trait-balance-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Toughness</span>
+                <input type="number" id="trait-toughness-val" class="trait-val" value="0" min="0">
+                <select id="trait-toughness-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+            </div>
+          </div><!-- /traits-col physical -->
+
+          <div class="traits-col">
+            <div class="trait-col-headers">
+              <span></span>
+              <span>Value</span>
+              <span>Die</span>
+            </div>
+            <div class="trait-group">
+              <div class="trait-row">
+                <span class="trait-name">Knowledge</span>
+                <input type="number" id="trait-knowledge-val" class="trait-val" value="0" min="0">
+                <select id="trait-knowledge-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Wisdom</span>
+                <input type="number" id="trait-wisdom-val" class="trait-val" value="0" min="0">
+                <select id="trait-wisdom-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Charisma</span>
+                <input type="number" id="trait-charisma-val" class="trait-val" value="0" min="0">
+                <select id="trait-charisma-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="trait-group">
+              <div class="trait-row">
+                <span class="trait-name">Willpower</span>
+                <input type="number" id="trait-willpower-val" class="trait-val" value="0" min="0">
+                <select id="trait-willpower-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Awareness</span>
+                <input type="number" id="trait-awareness-val" class="trait-val" value="0" min="0">
+                <select id="trait-awareness-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+              <div class="trait-row">
+                <span class="trait-name">Empathy</span>
+                <input type="number" id="trait-empathy-val" class="trait-val" value="0" min="0">
+                <select id="trait-empathy-die" class="trait-die">
+                  <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
+                </select>
+              </div>
+            </div>
+          </div><!-- /traits-col mental -->
+
+        </div><!-- /traits-grid -->
+
+        <div class="trait-points-tracker">
+          <span class="trait-points-label">Trait Points Used:</span>
+          <span id="trait-points-used">0</span>
+          <span class="trait-points-total">/ 20</span>
+          <span id="trait-points-warning" class="hidden">&nbsp;— over budget</span>
+        </div>
+
+        <div class="derived-panel">
+          <div class="derived-stats">
+            <div class="derived-row">
+              <span class="derived-label">Physical Defense</span>
+              <span class="derived-value" id="stat-phys-def">9</span>
+            </div>
+            <div class="derived-row">
+              <span class="derived-label">Mental Defense</span>
+              <span class="derived-value" id="stat-ment-def">9</span>
+            </div>
+            <div class="derived-row">
+              <span class="derived-label">Physical Mitigation</span>
+              <span class="derived-value" id="stat-phys-mit">0</span>
+            </div>
+            <div class="derived-row">
+              <span class="derived-label">Mental Mitigation</span>
+              <span class="derived-value" id="stat-ment-mit">0</span>
+            </div>
+            <div class="derived-row">
+              <span class="derived-label">Resolve</span>
+              <div class="tracker-group">
+                <input type="number" id="resolve-current" class="tracker-input" value="1" min="0" title="Current Resolve">
+                <span class="tracker-sep">/</span>
+                <span class="derived-value" id="stat-resolve-max">1</span>
+              </div>
+            </div>
+            <div class="derived-row">
+              <span class="derived-label">Speed</span>
+              <span class="derived-value" id="stat-speed">20 / 40 ft</span>
+            </div>
+            <div class="derived-row" id="resonance-row" style="display:none">
+              <span class="derived-label">Resonance</span>
+              <div class="tracker-group">
+                <input type="number" id="resonance-current" class="tracker-input" value="0" min="0" title="Current Resonance">
+                <span class="tracker-sep">/</span>
+                <span class="derived-value" id="stat-resonance-max">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="class-bonuses">
+            <div class="subsection-header">Class Bonuses</div>
+            <div class="bonus-grid">
+              <div class="bonus-field">
+                <label for="bonus-phys-def">+Phys Def</label>
+                <input type="number" id="bonus-phys-def" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-ment-def">+Ment Def</label>
+                <input type="number" id="bonus-ment-def" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-phys-mit">+Phys Mit</label>
+                <input type="number" id="bonus-phys-mit" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-ment-mit">+Ment Mit</label>
+                <input type="number" id="bonus-ment-mit" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-phys-dmg">+Phys Dmg</label>
+                <input type="number" id="bonus-phys-dmg" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-mag-dmg">+Mag Dmg</label>
+                <input type="number" id="bonus-mag-dmg" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-attack">+Attack</label>
+                <input type="number" id="bonus-attack" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-resolve">+Resolve</label>
+                <input type="number" id="bonus-resolve" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-resonance">+Resonance</label>
+                <input type="number" id="bonus-resonance" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-speed">+Speed (ft)</label>
+                <input type="number" id="bonus-speed" class="bonus-input" value="0" step="5">
+              </div>
+            </div>
+          </div>
+        </div><!-- /derived-panel -->
+
+      </div><!-- /traits-derived-layout -->
+    </section>
+
+    </div><!-- /concept-traits-layout -->
+
+    <div class="equip-magic-layout">
+
+    <!-- EQUIPMENT -->
+    <section class="card">
+      <div class="card-header">Equipment</div>
+      <div class="equipment-layout">
+
+        <div class="equip-col">
+          <div class="equip-col-header">Weapons</div>
+
+          <div class="weapon-slot">
+            <div class="weapon-slot-label">Weapon 1</div>
+            <div class="field">
+              <label for="weapon-1-name">Name</label>
+              <input type="text" id="weapon-1-name" placeholder="Weapon name">
+            </div>
+            <div class="weapon-stats-row">
+              <div class="field">
+                <label for="weapon-1-cat">Category</label>
+                <select id="weapon-1-cat">
+                  <option value="">None</option>
+                  <option value="simple">Simple</option>
+                  <option value="light">Light</option>
+                  <option value="standard">Standard</option>
+                  <option value="heavy">Heavy</option>
+                  <option value="brutal">Brutal</option>
+                  <option value="unarmed">Unarmed</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Dmg Die</label>
+                <span class="stat-display" id="weapon-1-dmg">—</span>
+              </div>
+              <div class="field">
+                <label>Main Acc</label>
+                <span class="stat-display" id="weapon-1-main-acc">—</span>
+              </div>
+              <div class="field">
+                <label>Off Acc</label>
+                <span class="stat-display" id="weapon-1-off-acc">—</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="weapon-1-notes">Notes</label>
+              <input type="text" id="weapon-1-notes" placeholder="Special properties, conditions...">
+            </div>
+          </div>
+
+          <div class="weapon-slot">
+            <div class="weapon-slot-label">Weapon 2</div>
+            <div class="field">
+              <label for="weapon-2-name">Name</label>
+              <input type="text" id="weapon-2-name" placeholder="Weapon name">
+            </div>
+            <div class="weapon-stats-row">
+              <div class="field">
+                <label for="weapon-2-cat">Category</label>
+                <select id="weapon-2-cat">
+                  <option value="">None</option>
+                  <option value="simple">Simple</option>
+                  <option value="light">Light</option>
+                  <option value="standard">Standard</option>
+                  <option value="heavy">Heavy</option>
+                  <option value="brutal">Brutal</option>
+                  <option value="unarmed">Unarmed</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Dmg Die</label>
+                <span class="stat-display" id="weapon-2-dmg">—</span>
+              </div>
+              <div class="field">
+                <label>Main Acc</label>
+                <span class="stat-display" id="weapon-2-main-acc">—</span>
+              </div>
+              <div class="field">
+                <label>Off Acc</label>
+                <span class="stat-display" id="weapon-2-off-acc">—</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="weapon-2-notes">Notes</label>
+              <input type="text" id="weapon-2-notes" placeholder="Special properties, conditions...">
+            </div>
+          </div>
+        </div>
+
+        <div class="equip-col">
+          <div class="equip-col-header">Armor, Shield &amp; Charm</div>
+
+          <div class="equip-item">
+            <div class="equip-item-label">Armor</div>
+            <div class="field">
+              <label for="armor-name">Name</label>
+              <input type="text" id="armor-name" placeholder="Armor name">
+            </div>
+            <div class="armor-stats-row">
+              <div class="field">
+                <label for="armor-cat">Category</label>
+                <select id="armor-cat">
+                  <option value="none">None</option>
+                  <option value="light">Light</option>
+                  <option value="standard">Standard</option>
+                  <option value="heavy">Heavy</option>
+                  <option value="bulwark">Bulwark</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Def Mod</label>
+                <span class="stat-display" id="armor-def-mod">+2</span>
+              </div>
+              <div class="field">
+                <label>Mitigation</label>
+                <span class="stat-display" id="armor-mit">+0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equip-item">
+            <div class="equip-item-label">Shield</div>
+            <div class="field">
+              <label for="shield-name">Name</label>
+              <input type="text" id="shield-name" placeholder="Shield name">
+            </div>
+            <div class="shield-stats-row">
+              <div class="field">
+                <label for="shield-size">Size</label>
+                <select id="shield-size">
+                  <option value="none">None</option>
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Def Bonus</label>
+                <span class="stat-display" id="shield-def-bonus">+0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equip-item">
+            <div class="equip-item-label">Charm</div>
+            <div class="field">
+              <label for="charm-name">Name</label>
+              <input type="text" id="charm-name" placeholder="Charm name">
+            </div>
+            <div class="charm-stats-row">
+              <div class="field">
+                <label for="charm-cat">Category</label>
+                <select id="charm-cat">
+                  <option value="none">None</option>
+                  <option value="light">Light</option>
+                  <option value="standard">Standard</option>
+                  <option value="heavy">Heavy</option>
+                  <option value="bulwark">Bulwark</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Def Mod</label>
+                <span class="stat-display" id="charm-def-mod">+2</span>
+              </div>
+              <div class="field">
+                <label>Mitigation</label>
+                <span class="stat-display" id="charm-mit">+0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="other-gear-row">
+        <div class="field">
+          <label for="other-gear">Other Gear</label>
+          <textarea id="other-gear" rows="3" placeholder="Additional items, accessories, consumables..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAGIC -->
+    <section class="card">
+      <div class="card-header">
+        <span>Magic</span>
+        <label class="magic-toggle-label">
+          <input type="checkbox" id="is-magical">
+          Magical Character
+        </label>
+      </div>
+      <div id="magic-content" class="magic-collapsed">
+        <div class="magic-body">
+          <div class="field">
+            <label for="magic-domain">Magical Domain</label>
+            <textarea id="magic-domain" rows="3" placeholder="Describe the thematic space of your magic..."></textarea>
+          </div>
+        </div>
+        <div class="card-header-sub">
+          <span>Foundational Effects</span>
+          <button class="add-btn-sub" id="add-effect-btn">+ Add</button>
+        </div>
+        <div id="effect-list"></div>
+        <p class="empty-message" id="effect-empty">No foundational effects added yet.</p>
+      </div>
+    </section>
+
+    </div><!-- /equip-magic-layout -->
+
+    <!-- CONDITIONS + NOTES -->
+    <section class="card">
+      <div class="card-header">Conditions &amp; Notes</div>
+      <div class="conditions-notes-layout">
+        <div class="conditions-panel">
+          <div class="subsection-header">Active Conditions</div>
+          <div class="conditions-grid">
+            <input type="text" id="condition-1" placeholder="Condition">
+            <input type="text" id="condition-2" placeholder="Condition">
+            <input type="text" id="condition-3" placeholder="Condition">
+            <input type="text" id="condition-4" placeholder="Condition">
+            <input type="text" id="condition-5" placeholder="Condition">
+            <input type="text" id="condition-6" placeholder="Condition">
+          </div>
+        </div>
+        <div class="notes-panel">
+          <div class="subsection-header">Notes</div>
+          <textarea id="notes" rows="8" placeholder="Session notes, reminders, lore..."></textarea>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="rs-modal" class="rs-modal" role="dialog" aria-modal="true">
+    <div class="rs-modal-backdrop" id="rs-modal-backdrop"></div>
+    <div class="rs-modal-card">
+      <div class="rs-modal-header" id="rs-modal-header">
+        <span id="rs-modal-title"></span>
+      </div>
+      <div class="rs-modal-body">
+        <p class="rs-modal-rules" id="rs-modal-rules"></p>
+        <div id="rs-modal-changes"></div>
+      </div>
+      <div class="rs-modal-footer">
+        <button class="btn" id="rs-modal-cancel">Cancel</button>
+        <button class="btn" id="rs-modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="formula-modal" class="formula-modal" role="dialog" aria-modal="true">
+    <div class="formula-modal-header">
+      <span id="formula-modal-title"></span>
+      <button id="formula-modal-close" class="formula-modal-close" title="Close">×</button>
+    </div>
+    <div id="formula-modal-body" class="formula-modal-body"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
