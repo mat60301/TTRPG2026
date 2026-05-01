@@ -449,7 +449,7 @@ function applyImport(data) {
   updateArmorDisplay();
   updateShieldDisplay();
   updateCharmDisplay();
-  updateDerivedStats();
+  updateClassModifierBonuses();
   saveToLocalStorage();
 }
 
@@ -862,6 +862,63 @@ function hideFormulaModal() {
 }
 
 // =====================
+// CLASS MODIFIER AUTO-FILL
+// =====================
+
+const CLASS_MOD_BONUSES = {
+  'Movement Speed':             { 'bonus-speed':     5 },
+  'Physical Damage Mitigation': { 'bonus-phys-mit':  1 },
+  'Mental Damage Mitigation':   { 'bonus-ment-mit':  1 },
+  'Physical Damage':            { 'bonus-phys-dmg':  1 },
+  'Magical Damage':             { 'bonus-mag-dmg':   1 },
+  'Attack Bonus':               { 'bonus-attack':    1 },
+  'Resolve':                    { 'bonus-resolve':   2 },
+  'Resonance':                  { 'bonus-resonance': 1 },
+  'Shield Training':            { 'bonus-phys-def':  1 },
+};
+
+const AUTO_BONUS_FIELDS = [
+  'bonus-speed', 'bonus-phys-mit', 'bonus-ment-mit',
+  'bonus-phys-dmg', 'bonus-mag-dmg', 'bonus-attack',
+  'bonus-resolve', 'bonus-resonance', 'bonus-phys-def',
+];
+
+function updateClassModifierBonuses() {
+  for (const id of AUTO_BONUS_FIELDS) setValue(id, 0);
+  for (let i = 1; i <= 3; i++) {
+    const bonuses = CLASS_MOD_BONUSES[getText('class-mod-' + i + '-type')];
+    if (!bonuses) continue;
+    for (const [id, amount] of Object.entries(bonuses)) {
+      const el = document.getElementById(id);
+      if (el) el.value = (parseInt(el.value, 10) || 0) + amount;
+    }
+  }
+  updateDerivedStats();
+}
+
+// =====================
+// CARD COLLAPSE (MOBILE)
+// =====================
+
+function initCardToggles() {
+  document.querySelectorAll('.card').forEach(function (card) {
+    const header = card.querySelector('.card-header');
+    if (!header) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'card-toggle';
+    btn.textContent = '▾';
+    btn.setAttribute('aria-label', 'Toggle section');
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const collapsed = card.classList.toggle('collapsed');
+      btn.textContent = collapsed ? '▸' : '▾';
+    });
+    header.appendChild(btn);
+  });
+}
+
+// =====================
 // INIT
 // =====================
 
@@ -885,6 +942,11 @@ document.addEventListener('DOMContentLoaded', function () {
     addFoundationalEffect();
     scheduleAutoSave();
   });
+
+  // Class modifier dropdowns — auto-fill bonus fields
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('class-mod-' + i + '-type')?.addEventListener('change', updateClassModifierBonuses);
+  }
 
   // Magic toggle
   document.getElementById('is-magical')?.addEventListener('change', function () {
@@ -1010,5 +1072,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === 'Escape') hideFormulaModal();
   });
 
+  initCardToggles();
   loadFromLocalStorage();
 });

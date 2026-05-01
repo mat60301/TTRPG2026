@@ -10,6 +10,13 @@ This is a tabletop roleplaying game (TTRPG) design project. The system is **role
 - `2026-TTRPG-Messy.md` — Raw text copy of the PDF (for reference)
 - `docs/` — Split, cleaned, and corrected rulebook (working documents)
 
+## GitHub Repository
+
+- **Repo:** https://github.com/mat60301/TTRPG2026.git
+- **Public URL (GitHub Pages):** https://mat60301.github.io/TTRPG2026/ — redirects to the web character sheet
+- **Push command:** `/TTRPGCommit` — auto-diffs, generates commit message, commits and pushes to `origin main` with no manual steps
+- **GitHub Pages setup:** Settings → Pages → main / root (must be enabled once manually in the repo settings)
+
 ## How to Use This File
 
 This file is updated at the end of each Claude chat session via `/handoff`. A new Claude session will read this file automatically and pick up where the last one left off — no manual re-explaining needed.
@@ -17,6 +24,82 @@ This file is updated at the end of each Claude chat session via `/handoff`. A ne
 ---
 
 ## Session History
+
+---
+
+## [Session 6] — May 1, 2026
+
+### Completed This Session
+- ✅ **GitHub repo created and connected** — `https://github.com/mat60301/TTRPG2026.git`; all 20 project files pushed to `main`; `.gitignore` excludes `.claude/`
+- ✅ **`/TTRPGCommit` command** — global command at `C:\Users\mat60\.claude\commands\TTRPGCommit.md`; auto-diffs, generates commit message, commits and pushes to `origin main` with no input required
+- ✅ **Root redirect** — `index.html` at repo root forwards to `character sheet/web version/index.html` so GitHub Pages URL is clean: `https://mat60301.github.io/TTRPG2026/`
+- ✅ **Mobile responsive CSS** — added `<meta name="viewport">` to index.html; two breakpoints:
+  - `≤768px` (tablet): all multi-column layouts stack; toolbar wraps to 2 rows; class mod rows wrap
+  - `≤480px` (phone): identity row uses 6-column grid — Name+Player on row 1, Species+Level+Class on row 2
+- ✅ **Physical / Mental labels** — added centered blue uppercase labels above each trait column inside the bordered box (all screen sizes)
+- ✅ **Mobile card collapse/expand** — `▾`/`▸` toggle button injected into every card header at init; button hidden on desktop; collapses/expands all card body content on mobile
+- ✅ **Derived stats reordered** — Resolve → Resonance (when magical) → Physical Defense → Mental Defense → Physical Mitigation → Mental Mitigation → Speed
+- ✅ **Resolve/Resonance highlight** — both rows get bold blue label, soft blue-tinted background (`#edf1f8`), 14px horizontal padding so they stand out as high-priority trackers
+- ✅ **Class modifier auto-fill** — selecting a modifier dropdown now auto-calculates and writes the corresponding bonus field; all 3 slots are summed (e.g. Resolve×2 = +4); recalculates derived stats immediately
+  - Auto-fills: Movement Speed (+5 speed), Phys/Ment Mitigation (+1 each), Phys/Mag Damage (+1), Attack Bonus (+1), Resolve (+2), Resonance (+1), Shield Training (+1 Phys Def)
+  - Does NOT auto-fill: Additional Specialization, Weapon/Armor/Charm Training (category-specific)
+
+### Files Modified This Session
+- `character sheet/web version/index.html` — viewport meta; Physical/Mental trait labels; derived stats reorder; Resolve/Resonance highlight classes
+- `character sheet/web version/styles.css` — `.traits-col-title`; `.card-toggle` base + mobile styles; `.card.collapsed` collapse rule; `.derived-row--highlight` style; responsive breakpoints (≤768px, ≤480px); 6-column identity grid at ≤480px
+- `character sheet/web version/script.js` — `CLASS_MOD_BONUSES`, `AUTO_BONUS_FIELDS`, `updateClassModifierBonuses()`; `initCardToggles()`; wired modifier dropdowns; called both on init and import
+- `index.html` (root) — NEW: redirect to web character sheet
+- `.gitignore` — NEW: excludes OS files, editor files, `.claude/`
+- `C:\Users\mat60\.claude\commands\TTRPGCommit.md` — NEW: global auto-commit command
+
+### Web Character Sheet — Current Layout
+```
+Toolbar: [Character Sheet title] | [Rest] [Sleep] | [Save Character] [Import Character]
+
+Row 1 — Two-column (left ~38% | right ~62%):
+  LEFT: Character Concept (Origin, Reason, Ultimate Fantasy)
+        Class Modifiers (3 picks — selecting auto-fills bonus fields)
+        Specializations (dynamic rows)
+  RIGHT: Traits & Derived Stats
+           [PHYSICAL (label) | MENTAL (label)] (side-by-side, Value/Die headers)
+           Trait Points tracker
+           [Derived Stats | Class Bonuses] (side-by-side below traits)
+             Derived order: Resolve* → Resonance* → Phys Def → Ment Def → Phys Mit → Ment Mit → Speed
+             *Resolve and Resonance highlighted (bold, blue-tinted background)
+             All derived stat values clickable — formula modal on hover/click
+
+Row 2 — Two-column (left ~58% | right ~42%):
+  LEFT: Equipment (Weapons | Armor+Shield+Charm, Other Gear)
+        Weapon/armor/shield/charm stat displays clickable — formula modal on hover/click
+  RIGHT: Magic (toggle, Domain, Foundational Effects)
+
+Row 3: Conditions & Notes
+
+Mobile (≤768px): all columns stack; each card has ▾/▸ collapse toggle in header
+Mobile (≤480px): identity row is 2-row grid (Name+Player / Species+Level+Class)
+```
+
+### Currently In Progress
+- 🔄 Changes from this session are uncommitted — run `/TTRPGCommit` to push
+- 🔄 GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
+
+### Next Steps (Priority Order)
+1. **Run `/TTRPGCommit`** to push all session changes
+2. **Enable GitHub Pages** in repo settings (one-time manual step)
+3. **Weapon/Armor/Charm Training auto-fill** — currently no auto-fill because bonuses are category-specific (e.g., Weapon Training for "melee standard" adds +1 attack/damage only for that category); needs a design decision about how to surface this on the sheet
+4. **Playtest** — sheet is functionally complete; watch for: hit rate feel, light weapon viability, non-magical vs magical satisfaction, Resolve fragility, class modifier balance
+5. **GM Section** — encounter creation, monster building, reward/advancement guidelines (blocked until core mechanics validated)
+6. **Review balance-notes.md** after first playtest and adjust
+7. **Print stylesheet** for the web character sheet
+
+### Blockers / Open Questions
+- Light weapons vs high-mitigation targets may be nearly useless (confirmed flagged, testing before fixing)
+- Non-magical bonus (4 extra specs = 6 total) is an estimate — needs table validation
+- Weapon/Armor/Charm Training category-specific bonuses have no dedicated field on the sheet — players currently note them in the detail text field; needs design decision
+- Bypass Immunity cost (4 Resonance) deferred to playtesting
+- Resonance refund on "succeed by 5+" deferred to playtesting
+
+---
 
 ## [Session 5] — May 1, 2026
 

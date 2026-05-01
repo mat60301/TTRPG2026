@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Character Sheet</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -160,6 +161,7 @@
         <div class="traits-grid">
 
           <div class="traits-col">
+            <div class="traits-col-title">Physical</div>
             <div class="trait-col-headers">
               <span></span>
               <span>Value</span>
@@ -215,6 +217,7 @@
           </div><!-- /traits-col physical -->
 
           <div class="traits-col">
+            <div class="traits-col-title">Mental</div>
             <div class="trait-col-headers">
               <span></span>
               <span>Value</span>
@@ -279,7 +282,25 @@
         </div>
 
         <div class="derived-panel">
-          <div class="derived-stats">
+          <div class="derived-stats derived-stats--trackers">
+            <div class="derived-row derived-row--highlight">
+              <span class="derived-label">Resolve</span>
+              <div class="tracker-group">
+                <input type="number" id="resolve-current" class="tracker-input" value="1" min="0" title="Current Resolve">
+                <span class="tracker-sep">/</span>
+                <span class="derived-value" id="stat-resolve-max">1</span>
+              </div>
+            </div>
+            <div class="derived-row derived-row--highlight" id="resonance-row" style="display:none">
+              <span class="derived-label">Resonance</span>
+              <div class="tracker-group">
+                <input type="number" id="resonance-current" class="tracker-input" value="0" min="0" title="Current Resonance">
+                <span class="tracker-sep">/</span>
+                <span class="derived-value" id="stat-resonance-max">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="derived-stats derived-stats--combat">
             <div class="derived-row">
               <span class="derived-label">Physical Defense</span>
               <span class="derived-value" id="stat-phys-def">9</span>
@@ -297,24 +318,8 @@
               <span class="derived-value" id="stat-ment-mit">0</span>
             </div>
             <div class="derived-row">
-              <span class="derived-label">Resolve</span>
-              <div class="tracker-group">
-                <input type="number" id="resolve-current" class="tracker-input" value="1" min="0" title="Current Resolve">
-                <span class="tracker-sep">/</span>
-                <span class="derived-value" id="stat-resolve-max">1</span>
-              </div>
-            </div>
-            <div class="derived-row">
               <span class="derived-label">Speed</span>
               <span class="derived-value" id="stat-speed">20 / 40 ft</span>
-            </div>
-            <div class="derived-row" id="resonance-row" style="display:none">
-              <span class="derived-label">Resonance</span>
-              <div class="tracker-group">
-                <input type="number" id="resonance-current" class="tracker-input" value="0" min="0" title="Current Resonance">
-                <span class="tracker-sep">/</span>
-                <span class="derived-value" id="stat-resonance-max">0</span>
-              </div>
             </div>
           </div>
 
