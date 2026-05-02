@@ -27,6 +27,52 @@ This file is updated at the end of each Claude chat session via `/handoff`. A ne
 
 ---
 
+## [Session 11] — May 2, 2026
+
+### Completed This Session
+- ✅ **Created `docs/12-monster-creation.md`** — full monster creation doc, covering:
+  - **6-field stat block** (Defense, Mitigation, Resolve, Attack Bonus, Damage, Speed) with design rationale for what was excluded (no trait values/dice, no Resonance by default)
+  - **Quick build tables for levels 1–5**, three rows each (Easy / Medium / Hard), all calibrated against actual player DPR math
+  - **Encounter design guidelines** — monster count by difficulty, action economy note, mixing tiers, conditions as narrative add-ons
+  - **Customization options** — resistances, multi-attack (reduce die one step per extra attack), area attacks, boss traits sidebar
+  - **NPC Creation placeholder** — stub section at the end, to be written in a future session
+- ✅ **Committed and pushed** — commit `3b13fec`
+
+### Monster Quick Build — Key Design Decisions
+- Monster attack bonus calibrated to ~50% / 60% / 70% hit rates vs average player defense per tier
+- Resolve ranges: lower = group monster (drops in 3–5 focused hits), upper = solo boss (5–7 rounds vs party of 4)
+- **Hard tier uses high Defense + moderate Mitigation (5–6 max)** — keeping mitigation below 8 preserves weapon choice meaningfulness; at mit 8+ with high defense, dual wield hits min-1 damage and the fight becomes "have Brutal weapon or fail"
+- Mitigation is the lever for weapon niches: Easy (0–1) favors dual wield, Medium (2–4) sits at the crossover, Hard (5–6) tips toward Heavy/Brutal
+- Attack bonus scales +1/level per tier to track player defense growth (+1/level from formula)
+
+### Monster Quick Build Tables Summary
+| Level | Easy | Medium | Hard |
+|-------|------|--------|------|
+| 1 | Def 10, Mit 0, Res 8–12, Atk +2, d6 | Def 13, Mit 2, Res 14–22, Atk +4, d8+2 | Def 16, Mit 4, Res 28–45, Atk +6, d10+3 |
+| 2 | Def 11, Mit 1, Res 10–16, Atk +3, d6+1 | Def 14, Mit 3, Res 20–30, Atk +5, d8+3 | Def 18, Mit 4, Res 34–54, Atk +7, d10+4 |
+| 3 | Def 12, Mit 1, Res 13–20, Atk +4, d8 | Def 15, Mit 3, Res 26–40, Atk +6, d10+3 | Def 19, Mit 5, Res 40–62, Atk +8, d12+4 |
+| 4 | Def 13, Mit 2, Res 16–26, Atk +5, d8+2 | Def 16, Mit 4, Res 34–52, Atk +7, d10+4 | Def 21, Mit 5, Res 48–74, Atk +10, 2d8+4 |
+| 5 | Def 14, Mit 2, Res 20–32, Atk +6, d8+3 | Def 17, Mit 5, Res 44–68, Atk +8, d12+4 | Def 22, Mit 6, Res 58–88, Atk +11, 2d10+5 |
+
+### Currently In Progress
+- 🔄 Nothing in progress — session was single-focus and completed
+
+### Next Steps (Priority Order)
+1. **Playtest** — both the character sheet and the monster quick build tables are ready for the table
+2. **NPC Creation section** — `docs/12-monster-creation.md` has a placeholder; fill in after playtesting establishes what NPC complexity is needed
+3. **GM Section** — reward/advancement guidelines (encounter creation now covered in #12)
+4. **Print stylesheet** for the web character sheet
+
+### Blockers / Open Questions
+- Penetration values (Heavy −2, Brutal −4) correct mathematically but may need tuning after first playtest
+- Hard tier Mitigation capped at 5–6 in quick build tables — raising it further risks the "wrong loadout = useless" problem; revisit only if playtest finds hard monsters too easy to kill
+- GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
+
+### Files Created / Modified
+- `docs/12-monster-creation.md` — NEW: full monster creation doc
+
+---
+
 ## [Session 10] — May 2, 2026
 
 ### Completed This Session
