@@ -222,12 +222,30 @@
             </div>
             <div class="trait-bonuses">
               <div class="trait-bonus-row">
-                <span class="trait-bonus-label">Attack Bonus</span>
-                <span class="trait-bonus-value" id="display-phys-attack">—</span>
+                <span class="trait-bonus-label">Main Hand Attack Bonus</span>
+                <span class="trait-bonus-value" id="display-mh-attack">+0</span>
               </div>
               <div class="trait-bonus-row">
-                <span class="trait-bonus-label">Damage Bonus</span>
-                <span class="trait-bonus-value" id="display-phys-dmg">—</span>
+                <span class="trait-bonus-label">Main Hand Weapon Damage</span>
+                <span class="trait-bonus-value" id="display-mh-weapon-dmg">—</span>
+              </div>
+              <div class="trait-bonus-row">
+                <span class="trait-bonus-label">Main Hand Damage Bonus</span>
+                <span class="trait-bonus-value" id="display-mh-dmg">+0</span>
+              </div>
+              <div id="oh-bonus-section" style="display:none">
+                <div class="trait-bonus-row">
+                  <span class="trait-bonus-label">Off Hand Attack Bonus</span>
+                  <span class="trait-bonus-value" id="display-oh-attack">+0</span>
+                </div>
+                <div class="trait-bonus-row">
+                  <span class="trait-bonus-label">Off Hand Weapon Damage</span>
+                  <span class="trait-bonus-value" id="display-oh-weapon-dmg">—</span>
+                </div>
+                <div class="trait-bonus-row">
+                  <span class="trait-bonus-label">Off Hand Damage Bonus</span>
+                  <span class="trait-bonus-value" id="display-oh-dmg">+0</span>
+                </div>
               </div>
             </div>
           </div><!-- /traits-col physical -->
@@ -288,12 +306,12 @@
             </div>
             <div class="trait-bonuses">
               <div class="trait-bonus-row">
-                <span class="trait-bonus-label">Attack Bonus</span>
-                <span class="trait-bonus-value" id="display-ment-attack">—</span>
+                <span class="trait-bonus-label">Mental Attack Bonus</span>
+                <span class="trait-bonus-value" id="display-ment-attack">+0</span>
               </div>
               <div class="trait-bonus-row">
-                <span class="trait-bonus-label">Damage Bonus</span>
-                <span class="trait-bonus-value" id="display-mag-dmg">—</span>
+                <span class="trait-bonus-label">Mental Damage Bonus</span>
+                <span class="trait-bonus-value" id="display-mag-dmg">+0</span>
               </div>
             </div>
           </div><!-- /traits-col mental -->
@@ -416,7 +434,7 @@
           <div class="equip-col-header">Weapons</div>
 
           <div class="weapon-slot">
-            <div class="weapon-slot-label">Weapon 1</div>
+            <div class="weapon-slot-label">Main Hand</div>
             <div class="field">
               <label for="weapon-1-name">Name</label>
               <input type="text" id="weapon-1-name" placeholder="Weapon name">
@@ -454,7 +472,7 @@
           </div>
 
           <div class="weapon-slot">
-            <div class="weapon-slot-label">Weapon 2</div>
+            <div class="weapon-slot-label">Off Hand</div>
             <div class="field">
               <label for="weapon-2-name">Name</label>
               <input type="text" id="weapon-2-name" placeholder="Weapon name">

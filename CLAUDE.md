@@ -27,6 +27,48 @@ This file is updated at the end of each Claude chat session via `/handoff`. A ne
 
 ---
 
+## [Session 8] — May 1, 2026
+
+### Completed This Session
+- ✅ **Committed Session 7 work** — ran `/TTRPGCommit`; pushed commit `876c56e` (training modifier system, split attack bonuses, layout restructure)
+- ✅ **Renamed weapon slots** — "Weapon 1" → "Main Hand", "Weapon 2" → "Off Hand" in the equipment section (`weapon-slot-label`)
+- ✅ **Expanded trait bonus display labels** — Physical column now shows four rows with full labels: "Main Hand Attack Bonus", "Main Hand Damage Bonus", "Off Hand Attack Bonus", "Off Hand Damage Bonus"; Mental column shows "Mental Attack Bonus" and "Mental Damage Bonus" (was "Attack Bonus" / "Damage Bonus")
+- ✅ **All bonus displays always show a number** — replaced `—` fallback with `+0`; every bonus value shows a formatted modifier at all times
+- ✅ **Weapon's own base accuracy included in attack bonus** — Main Hand Attack Bonus = weapon-1 mainAcc + Physical Attack class mods + Weapon Training; Off Hand Attack Bonus = weapon-2 offAcc + Physical Attack class mods + Weapon Training; heavy/brutal weapons show `—` for off-hand (can't be wielded one-handed without training)
+- ✅ **Formula popups updated** — "Weapon base accuracy" appears as its own row in the breakdown; off-hand popup explains when a weapon can't be used off-hand
+- ✅ **Weapon category changes trigger bonus display refresh** — `updateBonusDisplays()` now called on weapon-1 and weapon-2 category change events
+- ✅ **Rules clarification: off-hand damage** — confirmed via `docs/07-equipment.md`: the rules make **no distinction between main-hand and off-hand damage**. Only accuracy differs (mainAcc vs offAcc). Damage die and damage bonuses are identical for both hands.
+
+### Files Modified This Session
+- `character sheet/web version/index.html` — weapon slot labels ("Main Hand" / "Off Hand"); physical trait bonus rows (4 rows with full labels); mental trait bonus labels ("Mental Attack/Damage Bonus"); initial `+0` values
+- `character sheet/web version/script.js` — `parseAcc()` helper; `updateBonusDisplays()` rewritten to include weapon base accuracy; `FORMULA_MAP` updated (removed `display-phys-attack`/`display-phys-dmg`, added `display-mh-attack`, `display-mh-dmg`, `display-oh-attack`, `display-oh-dmg`); formula cases `mh-attack`, `mh-dmg`, `oh-attack`, `oh-dmg` (replaced `phys-attack`, `phys-dmg`); `ment-attack`/`mag-dmg` always show total; weapon category listeners also call `updateBonusDisplays()`
+
+### Currently In Progress
+- 🔄 Session 8 changes are uncommitted — run `/TTRPGCommit` to push
+- 🔄 **Open design question (unanswered):** Off Hand Damage Bonus and Main Hand Damage Bonus will always be the same number when both hands hold the same weapon category, since damage bonuses follow weapon category not hand position. Two options proposed: (a) rename to "Weapon 1 Damage Bonus" / "Weapon 2 Damage Bonus" to reflect they track the slot's weapon category; (b) collapse to a single shared "Damage Bonus" row since the formula is identical. User did not choose — address next session.
+
+### Next Steps (Priority Order)
+1. **Run `/TTRPGCommit`** to push Session 8 changes
+2. **Resolve damage bonus display question** — rename to Weapon 1/2, collapse to single row, or keep as-is
+3. **Playtest** — sheet is functionally complete; watch for: hit rate feel, light weapon viability, non-magical vs magical satisfaction, Resolve fragility, training modifier balance
+4. **GM Section** — encounter creation, monster building, reward/advancement guidelines (blocked until core mechanics validated)
+5. **Review balance-notes.md** after first playtest and adjust
+6. **Print stylesheet** for the web character sheet
+
+### Blockers / Open Questions
+- Off-hand damage bonus display may be misleading (see "Currently In Progress" above)
+- Light weapons vs high-mitigation targets may be nearly useless (confirmed flagged, testing before fixing)
+- Non-magical bonus (4 extra specs = 6 total) is an estimate — needs table validation
+- Bypass Immunity cost (4 Resonance) deferred to playtesting
+- Resonance refund on "succeed by 5+" deferred to playtesting
+- GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
+
+### Design Decisions Made This Session
+- Weapon base accuracy (mainAcc/offAcc) is included in the trait panel attack bonus totals — gives players a single number to add to their d20 roll per hand
+- Off-hand damage: confirmed by rules that no penalty applies; only accuracy changes hand-to-hand
+
+---
+
 ## [Session 7] — May 1, 2026
 
 ### Completed This Session
