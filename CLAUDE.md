@@ -27,6 +27,87 @@ This file is updated at the end of each Claude chat session via `/handoff`. A ne
 
 ---
 
+## [Session 7] — May 1, 2026
+
+### Completed This Session
+- ✅ **Hidden class bonus panel** — the "Class Bonuses" number inputs are now `display:none`; they remain in the DOM for JS calculations but are invisible to the player (auto-fill makes manual editing pointless and confusing)
+- ✅ **Resolve/Resonance moved left** — derived stats now split 50/50: left column = Resolve + Resonance trackers, right column = Physical Defense, Mental Defense, Physical Mitigation, Mental Mitigation, Speed
+- ✅ **Tracker alignment polish** — Resolve/Resonance labels right-aligned with fixed `min-width: 88px` so they stack flush; max value (`stat-resolve-max`, `stat-resonance-max`) left-aligned inside the tracker group; highlight background narrowed (8px padding); content centered within the background
+- ✅ **Split Attack Bonus → Physical Attack Bonus + Mental Attack Bonus** — updated in `docs/03-character-creation.md` (table row split) and throughout the web sheet (3 dropdowns, hidden bonus inputs, `CLASS_MOD_BONUSES`, `AUTO_BONUS_FIELDS`, `STATIC_FIELDS`)
+- ✅ **Attack/Damage bonus displays in trait columns** — each trait column (Physical, Mental) now shows "Attack Bonus" and "Damage Bonus" rows at the bottom, separated by a divider; display values (`display-phys-attack`, `display-phys-dmg`, `display-ment-attack`, `display-mag-dmg`) update live from class modifier selections; show "—" when zero
+- ✅ **Formula popups on trait bonus displays** — hovering/clicking the four new bonus values shows a modal listing which class modifier slot(s) are contributing (e.g. "Class Modifier 1 +1") with a total row, or "none selected" message
+- ✅ **Training modifier system (full implementation)** — Weapon/Armor/Charm/Shield Training class modifiers now:
+  - Replace the free-text detail box with a category dropdown when selected (e.g. Weapon Training → Simple/Light/Standard/Heavy/Brutal/Unarmed; Armor Training → Light/Standard/Heavy/Bulwark; Shield Training → Small/Medium/Large)
+  - Revert to the text box when a non-training modifier is selected
+  - Apply bonuses **conditionally** — only if the matching item category is equipped:
+    - **Weapon Training**: +1 main-hand accuracy, +1 off-hand accuracy, +1 damage (for that weapon only)
+    - **Armor Training**: +1 Physical Defense, +1 Physical Mitigation
+    - **Charm Training**: +1 Mental Defense, +1 Mental Mitigation
+    - **Shield Training**: +1 Physical Defense
+  - Update live when equipment changes or modifier category changes
+  - Show training source rows in all relevant formula modals ("Armor Training (Mod 1) +1", etc.)
+  - Shield Training removed from unconditional auto-fill — now equipment-conditional only
+  - Category selections saved/restored correctly via `STATIC_FIELDS` + `applyImport` re-hydration
+
+### Files Modified This Session
+- `character sheet/web version/index.html` — hidden category selects (3 slots); Resolve/Resonance HTML split from defense stats; Attack/Damage bonus display rows in trait columns
+- `character sheet/web version/styles.css` — `.derived-stats--trackers/--combat` (50/50 flex); `.derived-row--highlight` (narrowed, centered, label alignment); `.tracker-group .derived-value` (left-align); `.trait-bonuses` / `.trait-bonus-row` / `.trait-bonus-value`; `.class-mod-category`
+- `character sheet/web version/script.js` — `TRAINING_CATEGORIES`; `getTrainingBonuses()`; `updateClassModSlot()`; `initTrainingSlots()`; `updateBonusDisplays()`; training injected into `updateDerivedStats()` and `updateWeaponStats()`; all formula modal cases updated (phys-def, phys-mit, ment-def, ment-mit, weapon-N-dmg/acc/off); `applyImport()` re-hydrates training slots; init listeners updated
+- `docs/03-character-creation.md` — Attack Bonus row split into Physical/Mental Attack Bonus
+
+### Web Character Sheet — Current Layout
+```
+Toolbar: [Character Sheet title] | [Rest] [Sleep] | [Save Character] [Import Character]
+
+Row 1 — Two-column (left ~38% | right ~62%):
+  LEFT: Character Concept (Origin, Reason, Ultimate Fantasy)
+        Class Modifiers (3 picks — training types show category dropdown; others show text detail)
+        Specializations (dynamic rows)
+  RIGHT: Traits & Derived Stats
+           [PHYSICAL (label) | MENTAL (label)] (side-by-side, Value/Die headers)
+           Attack Bonus + Damage Bonus displays at bottom of each trait column (live, formula popup)
+           Trait Points tracker
+           [Resolve/Resonance trackers (left 50%) | Defense/Mit/Speed stats (right 50%)]
+             Resolve and Resonance: highlighted, label right-aligned, tracker left-aligned
+             All derived stat values clickable — formula modal on hover/click
+             Formula modals now include Training bonus rows where applicable
+
+Row 2 — Two-column (left ~58% | right ~42%):
+  LEFT: Equipment (Weapons | Armor+Shield+Charm, Other Gear)
+        Weapon/armor/shield/charm stat displays clickable — formula modal on hover/click
+        Weapon accuracy reflects training bonus live
+  RIGHT: Magic (toggle, Domain, Foundational Effects)
+
+Row 3: Conditions & Notes
+
+Mobile (≤768px): all columns stack; each card has ▾/▸ collapse toggle in header
+Mobile (≤480px): identity row is 2-row grid (Name+Player / Species+Level+Class)
+```
+
+### Currently In Progress
+- 🔄 All session changes are uncommitted — run `/TTRPGCommit` to push
+
+### Next Steps (Priority Order)
+1. **Run `/TTRPGCommit`** to push all session changes
+2. **Playtest** — sheet is now functionally complete with full training system; watch for: hit rate feel, light weapon viability, non-magical vs magical satisfaction, Resolve fragility, training modifier balance
+3. **GM Section** — encounter creation, monster building, reward/advancement guidelines (blocked until core mechanics validated)
+4. **Review balance-notes.md** after first playtest and adjust
+5. **Print stylesheet** for the web character sheet
+
+### Blockers / Open Questions
+- Light weapons vs high-mitigation targets may be nearly useless (confirmed flagged, testing before fixing)
+- Non-magical bonus (4 extra specs = 6 total) is an estimate — needs table validation
+- Bypass Immunity cost (4 Resonance) deferred to playtesting
+- Resonance refund on "succeed by 5+" deferred to playtesting
+- GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
+
+### Design Decisions Made This Session
+- Training bonuses are equipment-conditional (only apply if matching item equipped) — not passive rank bonuses
+- Shield Training removed from unconditional CLASS_MOD_BONUSES; now fully conditional like other training types
+- Physical Attack Bonus and Mental Attack Bonus are separate class modifier options (were previously one "Attack Bonus")
+
+---
+
 ## [Session 6] — May 1, 2026
 
 ### Completed This Session

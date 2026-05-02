@@ -107,11 +107,14 @@ function updateDerivedStats() {
   const bResonance = getInt('bonus-resonance');
   const bSpeed     = getInt('bonus-speed');
 
+  // Training bonuses (equipment-conditional class mod bonuses)
+  const training = getTrainingBonuses();
+
   // Formulas
-  const physDef    = 8 + end + bal + tou + level + armor.defMod + shield.def + bPhysDef;
-  const mentDef    = 8 + wil + awr + emp + level + charm.defMod + bMentDef;
-  const physMit    = bal + tou + armor.mit + bPhysMit;
-  const mentMit    = awr + emp + charm.mit + bMentMit;
+  const physDef    = 8 + end + bal + tou + level + armor.defMod + shield.def + bPhysDef + training.physDef;
+  const mentDef    = 8 + wil + awr + emp + level + charm.defMod + bMentDef + training.mentDef;
+  const physMit    = bal + tou + armor.mit + bPhysMit + training.physMit;
+  const mentMit    = awr + emp + charm.mit + bMentMit + training.mentMit;
   const resolveMax = (end * wil) + level + bResolve;
   const resonanceMax = emp + bal + level + bResonance;
   const combatSpeed  = 20 + Math.floor(spd / 2) * 5 + bSpeed;
@@ -135,9 +138,14 @@ function updateWeaponStats(n) {
   const cat = getText('weapon-' + n + '-cat');
   const stats = WEAPON_STATS[cat];
   if (stats) {
+    const training  = getTrainingBonuses();
+    const atkBonus  = n === 1 ? training.weapon1Attack : training.weapon2Attack;
+    const baseMain  = parseInt(stats.mainAcc.replace('−', '-'), 10);
+    const offIsNA   = stats.offAcc === '—';
+    const baseOff   = offIsNA ? null : parseInt(stats.offAcc.replace('−', '-'), 10);
     setText('weapon-' + n + '-dmg',      stats.dmg);
-    setText('weapon-' + n + '-main-acc', stats.mainAcc);
-    setText('weapon-' + n + '-off-acc',  stats.offAcc);
+    setText('weapon-' + n + '-main-acc', atkBonus ? fmtMod(baseMain + atkBonus) : stats.mainAcc);
+    setText('weapon-' + n + '-off-acc',  (atkBonus && !offIsNA) ? fmtMod(baseOff + atkBonus) : stats.offAcc);
   } else {
     setText('weapon-' + n + '-dmg',      '—');
     setText('weapon-' + n + '-main-acc', '—');
@@ -283,12 +291,12 @@ const STATIC_FIELDS = [
   'trait-awareness-val', 'trait-awareness-die',
   'trait-empathy-val', 'trait-empathy-die',
   'bonus-phys-def', 'bonus-ment-def', 'bonus-phys-mit', 'bonus-ment-mit',
-  'bonus-phys-dmg', 'bonus-mag-dmg', 'bonus-attack',
+  'bonus-phys-dmg', 'bonus-mag-dmg', 'bonus-phys-attack', 'bonus-ment-attack',
   'bonus-resolve', 'bonus-resonance', 'bonus-speed',
   'resolve-current', 'resonance-current',
-  'class-mod-1-type', 'class-mod-1-detail',
-  'class-mod-2-type', 'class-mod-2-detail',
-  'class-mod-3-type', 'class-mod-3-detail',
+  'class-mod-1-type', 'class-mod-1-detail', 'class-mod-1-category',
+  'class-mod-2-type', 'class-mod-2-detail', 'class-mod-2-category',
+  'class-mod-3-type', 'class-mod-3-detail', 'class-mod-3-category',
   'weapon-1-name', 'weapon-1-cat', 'weapon-1-notes',
   'weapon-2-name', 'weapon-2-cat', 'weapon-2-notes',
   'armor-name', 'armor-cat',
@@ -441,6 +449,14 @@ function applyImport(data) {
   }
   if (Array.isArray(data._effects)) {
     for (const ef of data._effects) addFoundationalEffect(ef);
+  }
+
+  // Restore training slot UI (populate dropdowns, show/hide inputs)
+  for (let i = 1; i <= 3; i++) {
+    updateClassModSlot(i);
+    const catEl = document.getElementById('class-mod-' + i + '-category');
+    const catVal = data['class-mod-' + i + '-category'];
+    if (catEl && catVal) catEl.value = catVal;
   }
 
   // Refresh all displays
@@ -606,6 +622,10 @@ const FORMULA_MAP = {
   'shield-def-bonus':   'shield-def',
   'charm-def-mod':      'charm-def',
   'charm-mit':          'charm-mit',
+  'display-phys-attack': 'phys-attack',
+  'display-phys-dmg':    'phys-dmg',
+  'display-ment-attack': 'ment-attack',
+  'display-mag-dmg':     'mag-dmg',
 };
 
 let _fmHoverTimer;
@@ -624,9 +644,10 @@ function buildFormulaContent(key) {
   const armorCat   = getText('armor-cat')   || 'none';
   const shieldSize = getText('shield-size') || 'none';
   const charmCat   = getText('charm-cat')   || 'none';
-  const armor  = ARMOR_STATS[armorCat]    ?? ARMOR_STATS.none;
-  const shield = SHIELD_STATS[shieldSize] ?? SHIELD_STATS.none;
-  const charm  = ARMOR_STATS[charmCat]    ?? ARMOR_STATS.none;
+  const armor    = ARMOR_STATS[armorCat]    ?? ARMOR_STATS.none;
+  const shield   = SHIELD_STATS[shieldSize] ?? SHIELD_STATS.none;
+  const charm    = ARMOR_STATS[charmCat]    ?? ARMOR_STATS.none;
+  const training = getTrainingBonuses();
 
   const bPhysDef   = getInt('bonus-phys-def');
   const bMentDef   = getInt('bonus-ment-def');
@@ -649,10 +670,17 @@ function buildFormulaContent(key) {
 
   switch (key) {
     case 'phys-def': {
-      const total = 8 + end + bal + tou + level + armor.defMod + shield.def + bPhysDef;
+      let trainingRows = '';
+      for (let i = 1; i <= 3; i++) {
+        const mType = getText('class-mod-' + i + '-type');
+        const mCat  = getText('class-mod-' + i + '-category') || '';
+        if (mType === 'Armor Training'  && armorCat   !== 'none' && armorCat   === mCat) trainingRows += r('Armor Training (Mod '  + i + ')', 1);
+        if (mType === 'Shield Training' && shieldSize  !== 'none' && shieldSize  === mCat) trainingRows += r('Shield Training (Mod ' + i + ')', 1);
+      }
+      const total = 8 + end + bal + tou + level + armor.defMod + shield.def + bPhysDef + training.physDef;
       return {
         title: 'Physical Defense',
-        eq: '8 + Endurance + Balance + Toughness + Level\n+ Armor Def Mod + Shield Def + Class Bonus',
+        eq: '8 + Endurance + Balance + Toughness + Level\n+ Armor Def Mod + Shield Def + Class Bonus + Training',
         body: tbl(
           '<tr><td>Base</td><td>+8</td></tr>' +
           r('Endurance', end) + r('Balance', bal) + r('Toughness', tou) +
@@ -660,47 +688,69 @@ function buildFormulaContent(key) {
           r('Armor Def Mod', armor.defMod, armorCat) +
           r('Shield Def', shield.def, shieldSize) +
           r('Class Bonus', bPhysDef) +
+          trainingRows +
           tot(total)
         )
       };
     }
     case 'ment-def': {
-      const total = 8 + wil + awr + emp + level + charm.defMod + bMentDef;
+      let trainingRows = '';
+      for (let i = 1; i <= 3; i++) {
+        const mType = getText('class-mod-' + i + '-type');
+        const mCat  = getText('class-mod-' + i + '-category') || '';
+        if (mType === 'Charm Training' && charmCat !== 'none' && charmCat === mCat) trainingRows += r('Charm Training (Mod ' + i + ')', 1);
+      }
+      const total = 8 + wil + awr + emp + level + charm.defMod + bMentDef + training.mentDef;
       return {
         title: 'Mental Defense',
-        eq: '8 + Willpower + Awareness + Empathy + Level\n+ Charm Def Mod + Class Bonus',
+        eq: '8 + Willpower + Awareness + Empathy + Level\n+ Charm Def Mod + Class Bonus + Training',
         body: tbl(
           '<tr><td>Base</td><td>+8</td></tr>' +
           r('Willpower', wil) + r('Awareness', awr) + r('Empathy', emp) +
           r('Level', level) +
           r('Charm Def Mod', charm.defMod, charmCat) +
           r('Class Bonus', bMentDef) +
+          trainingRows +
           tot(total)
         )
       };
     }
     case 'phys-mit': {
-      const total = bal + tou + armor.mit + bPhysMit;
+      let trainingRows = '';
+      for (let i = 1; i <= 3; i++) {
+        const mType = getText('class-mod-' + i + '-type');
+        const mCat  = getText('class-mod-' + i + '-category') || '';
+        if (mType === 'Armor Training' && armorCat !== 'none' && armorCat === mCat) trainingRows += r('Armor Training (Mod ' + i + ')', 1);
+      }
+      const total = bal + tou + armor.mit + bPhysMit + training.physMit;
       return {
         title: 'Physical Mitigation',
-        eq: 'Balance + Toughness + Armor Mitigation + Class Bonus',
+        eq: 'Balance + Toughness + Armor Mitigation + Class Bonus + Training',
         body: tbl(
           r('Balance', bal) + r('Toughness', tou) +
           r('Armor Mitigation', armor.mit, armorCat) +
           r('Class Bonus', bPhysMit) +
+          trainingRows +
           tot(total)
         )
       };
     }
     case 'ment-mit': {
-      const total = awr + emp + charm.mit + bMentMit;
+      let trainingRows = '';
+      for (let i = 1; i <= 3; i++) {
+        const mType = getText('class-mod-' + i + '-type');
+        const mCat  = getText('class-mod-' + i + '-category') || '';
+        if (mType === 'Charm Training' && charmCat !== 'none' && charmCat === mCat) trainingRows += r('Charm Training (Mod ' + i + ')', 1);
+      }
+      const total = awr + emp + charm.mit + bMentMit + training.mentMit;
       return {
         title: 'Mental Mitigation',
-        eq: 'Awareness + Empathy + Charm Mitigation + Class Bonus',
+        eq: 'Awareness + Empathy + Charm Mitigation + Class Bonus + Training',
         body: tbl(
           r('Awareness', awr) + r('Empathy', emp) +
           r('Charm Mitigation', charm.mit, charmCat) +
           r('Class Bonus', bMentMit) +
+          trainingRows +
           tot(total)
         )
       };
@@ -751,49 +801,79 @@ function buildFormulaContent(key) {
     case 'weapon-1-dmg':
     case 'weapon-2-dmg': {
       const n = key.startsWith('weapon-1') ? '1' : '2';
-      const cat = getText('weapon-' + n + '-cat');
-      const stats = WEAPON_STATS[cat];
+      const wCat = getText('weapon-' + n + '-cat');
+      const stats = WEAPON_STATS[wCat];
+      let trainingRows = '';
+      if (stats) {
+        for (let i = 1; i <= 3; i++) {
+          const mType = getText('class-mod-' + i + '-type');
+          const mCat  = getText('class-mod-' + i + '-category') || '';
+          if (mType === 'Weapon Training' && mCat === wCat) trainingRows += r('Damage Bonus (Mod ' + i + ')', 1);
+        }
+      }
       return {
         title: 'Damage Die — Weapon ' + n,
         eq: 'Determined by weapon category',
         body: stats
-          ? '<p class="fm-cat">Category: <strong>' + cat + '</strong></p>' +
+          ? '<p class="fm-cat">Category: <strong>' + wCat + '</strong></p>' +
             tbl('<tr><td>Damage Die</td><td>' + stats.dmg + '</td></tr>' +
                 '<tr><td>Main Accuracy</td><td>' + stats.mainAcc + '</td></tr>' +
-                '<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>')
+                '<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>' +
+                trainingRows)
           : '<p class="fm-empty">No weapon category selected.</p>'
       };
     }
     case 'weapon-1-acc':
     case 'weapon-2-acc': {
       const n = key.startsWith('weapon-1') ? '1' : '2';
-      const cat = getText('weapon-' + n + '-cat');
-      const stats = WEAPON_STATS[cat];
+      const wCat = getText('weapon-' + n + '-cat');
+      const stats = WEAPON_STATS[wCat];
+      if (!stats) return { title: 'Main-hand Accuracy — Weapon ' + n, eq: '', body: '<p class="fm-empty">No weapon category selected.</p>' };
+      const atkBonus = n === '1' ? training.weapon1Attack : training.weapon2Attack;
+      const baseMain = parseInt(stats.mainAcc.replace('−', '-'), 10);
+      let trainingRows = '';
+      for (let i = 1; i <= 3; i++) {
+        const mType = getText('class-mod-' + i + '-type');
+        const mCat  = getText('class-mod-' + i + '-category') || '';
+        if (mType === 'Weapon Training' && mCat === wCat) trainingRows += r('Weapon Training (Mod ' + i + ')', 1);
+      }
       return {
         title: 'Main-hand Accuracy — Weapon ' + n,
-        eq: 'Determined by weapon category',
-        body: stats
-          ? '<p class="fm-cat">Category: <strong>' + cat + '</strong></p>' +
-            tbl('<tr><td>Main Accuracy</td><td>' + stats.mainAcc + '</td></tr>' +
-                '<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>' +
-                '<tr><td>Damage Die</td><td>' + stats.dmg + '</td></tr>')
-          : '<p class="fm-empty">No weapon category selected.</p>'
+        eq: 'Base accuracy + Weapon Training bonus',
+        body: '<p class="fm-cat">Category: <strong>' + wCat + '</strong></p>' +
+          tbl('<tr><td>Base Main Accuracy</td><td>' + stats.mainAcc + '</td></tr>' +
+              '<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>' +
+              '<tr><td>Damage Die</td><td>' + stats.dmg + '</td></tr>' +
+              trainingRows +
+              (atkBonus ? tot(fmtMod(baseMain + atkBonus)) : ''))
       };
     }
     case 'weapon-1-off':
     case 'weapon-2-off': {
       const n = key.startsWith('weapon-1') ? '1' : '2';
-      const cat = getText('weapon-' + n + '-cat');
-      const stats = WEAPON_STATS[cat];
+      const wCat = getText('weapon-' + n + '-cat');
+      const stats = WEAPON_STATS[wCat];
+      if (!stats) return { title: 'Off-hand Accuracy — Weapon ' + n, eq: '', body: '<p class="fm-empty">No weapon category selected.</p>' };
+      const atkBonus = n === '1' ? training.weapon1Attack : training.weapon2Attack;
+      const offIsNA  = stats.offAcc === '—';
+      const baseOff  = offIsNA ? null : parseInt(stats.offAcc.replace('−', '-'), 10);
+      let trainingRows = '';
+      if (!offIsNA) {
+        for (let i = 1; i <= 3; i++) {
+          const mType = getText('class-mod-' + i + '-type');
+          const mCat  = getText('class-mod-' + i + '-category') || '';
+          if (mType === 'Weapon Training' && mCat === wCat) trainingRows += r('Weapon Training (Mod ' + i + ')', 1);
+        }
+      }
       return {
         title: 'Off-hand Accuracy — Weapon ' + n,
-        eq: 'Determined by weapon category',
-        body: stats
-          ? '<p class="fm-cat">Category: <strong>' + cat + '</strong></p>' +
-            tbl('<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>' +
-                '<tr><td>Main Accuracy</td><td>' + stats.mainAcc + '</td></tr>' +
-                '<tr><td>Damage Die</td><td>' + stats.dmg + '</td></tr>')
-          : '<p class="fm-empty">No weapon category selected.</p>'
+        eq: 'Base accuracy + Weapon Training bonus',
+        body: '<p class="fm-cat">Category: <strong>' + wCat + '</strong></p>' +
+          tbl('<tr><td>Base Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>' +
+              '<tr><td>Main Accuracy</td><td>' + stats.mainAcc + '</td></tr>' +
+              '<tr><td>Damage Die</td><td>' + stats.dmg + '</td></tr>' +
+              trainingRows +
+              (atkBonus && !offIsNA ? tot(fmtMod(baseOff + atkBonus)) : ''))
       };
     }
     case 'armor-def': {
@@ -840,6 +920,66 @@ function buildFormulaContent(key) {
               '<tr><td>Defense Modifier</td><td>' + fmtMod(charm.defMod) + '</td></tr>')
       };
     }
+    case 'phys-attack': {
+      const total = getInt('bonus-phys-attack');
+      const rows = [];
+      for (let i = 1; i <= 3; i++) {
+        if (getText('class-mod-' + i + '-type') === 'Physical Attack Bonus')
+          rows.push('<tr><td>Class Modifier ' + i + '</td><td>+1</td></tr>');
+      }
+      return {
+        title: 'Physical Attack Bonus',
+        eq: 'Sum of Physical Attack Bonus class modifiers',
+        body: rows.length
+          ? tbl(rows.join('') + tot(fmtMod(total)))
+          : '<p class="fm-empty">No Physical Attack Bonus modifiers selected.</p>'
+      };
+    }
+    case 'phys-dmg': {
+      const total = getInt('bonus-phys-dmg');
+      const rows = [];
+      for (let i = 1; i <= 3; i++) {
+        if (getText('class-mod-' + i + '-type') === 'Physical Damage')
+          rows.push('<tr><td>Class Modifier ' + i + '</td><td>+1</td></tr>');
+      }
+      return {
+        title: 'Physical Damage Bonus',
+        eq: 'Sum of Physical Damage class modifiers',
+        body: rows.length
+          ? tbl(rows.join('') + tot(fmtMod(total)))
+          : '<p class="fm-empty">No Physical Damage modifiers selected.</p>'
+      };
+    }
+    case 'ment-attack': {
+      const total = getInt('bonus-ment-attack');
+      const rows = [];
+      for (let i = 1; i <= 3; i++) {
+        if (getText('class-mod-' + i + '-type') === 'Mental Attack Bonus')
+          rows.push('<tr><td>Class Modifier ' + i + '</td><td>+1</td></tr>');
+      }
+      return {
+        title: 'Mental Attack Bonus',
+        eq: 'Sum of Mental Attack Bonus class modifiers',
+        body: rows.length
+          ? tbl(rows.join('') + tot(fmtMod(total)))
+          : '<p class="fm-empty">No Mental Attack Bonus modifiers selected.</p>'
+      };
+    }
+    case 'mag-dmg': {
+      const total = getInt('bonus-mag-dmg');
+      const rows = [];
+      for (let i = 1; i <= 3; i++) {
+        if (getText('class-mod-' + i + '-type') === 'Magical Damage')
+          rows.push('<tr><td>Class Modifier ' + i + '</td><td>+1</td></tr>');
+      }
+      return {
+        title: 'Magical Damage Bonus',
+        eq: 'Sum of Magical Damage class modifiers',
+        body: rows.length
+          ? tbl(rows.join('') + tot(fmtMod(total)))
+          : '<p class="fm-empty">No Magical Damage modifiers selected.</p>'
+      };
+    }
     default:
       return { title: 'Formula', eq: '', body: '<p>No formula available.</p>' };
   }
@@ -871,17 +1011,91 @@ const CLASS_MOD_BONUSES = {
   'Mental Damage Mitigation':   { 'bonus-ment-mit':  1 },
   'Physical Damage':            { 'bonus-phys-dmg':  1 },
   'Magical Damage':             { 'bonus-mag-dmg':   1 },
-  'Attack Bonus':               { 'bonus-attack':    1 },
+  'Physical Attack Bonus':      { 'bonus-phys-attack': 1 },
+  'Mental Attack Bonus':        { 'bonus-ment-attack': 1 },
   'Resolve':                    { 'bonus-resolve':   2 },
   'Resonance':                  { 'bonus-resonance': 1 },
-  'Shield Training':            { 'bonus-phys-def':  1 },
 };
 
 const AUTO_BONUS_FIELDS = [
   'bonus-speed', 'bonus-phys-mit', 'bonus-ment-mit',
-  'bonus-phys-dmg', 'bonus-mag-dmg', 'bonus-attack',
+  'bonus-phys-dmg', 'bonus-mag-dmg', 'bonus-phys-attack', 'bonus-ment-attack',
   'bonus-resolve', 'bonus-resonance', 'bonus-phys-def',
 ];
+
+const TRAINING_CATEGORIES = {
+  'Weapon Training': ['simple', 'light', 'standard', 'heavy', 'brutal', 'unarmed'],
+  'Armor Training':  ['light', 'standard', 'heavy', 'bulwark'],
+  'Charm Training':  ['light', 'standard', 'heavy', 'bulwark'],
+  'Shield Training': ['small', 'medium', 'large'],
+};
+
+function getTrainingBonuses() {
+  const armorCat   = getText('armor-cat')    || 'none';
+  const shieldSize = getText('shield-size')  || 'none';
+  const charmCat   = getText('charm-cat')    || 'none';
+  const w1Cat      = getText('weapon-1-cat') || '';
+  const w2Cat      = getText('weapon-2-cat') || '';
+  const out = {
+    physDef: 0, physMit: 0, mentDef: 0, mentMit: 0,
+    weapon1Attack: 0, weapon1Dmg: 0, weapon2Attack: 0, weapon2Dmg: 0,
+  };
+  for (let i = 1; i <= 3; i++) {
+    const type = getText('class-mod-' + i + '-type');
+    const cat  = getText('class-mod-' + i + '-category') || '';
+    if (!cat) continue;
+    if (type === 'Weapon Training') {
+      if (w1Cat && w1Cat === cat) { out.weapon1Attack++; out.weapon1Dmg++; }
+      if (w2Cat && w2Cat === cat) { out.weapon2Attack++; out.weapon2Dmg++; }
+    } else if (type === 'Armor Training') {
+      if (armorCat !== 'none' && armorCat === cat) { out.physDef++; out.physMit++; }
+    } else if (type === 'Charm Training') {
+      if (charmCat !== 'none' && charmCat === cat) { out.mentDef++; out.mentMit++; }
+    } else if (type === 'Shield Training') {
+      if (shieldSize !== 'none' && shieldSize === cat) { out.physDef++; }
+    }
+  }
+  return out;
+}
+
+function updateClassModSlot(i) {
+  const type    = getText('class-mod-' + i + '-type');
+  const cats    = TRAINING_CATEGORIES[type];
+  const detailEl = document.getElementById('class-mod-' + i + '-detail');
+  const catEl    = document.getElementById('class-mod-' + i + '-category');
+  if (!detailEl || !catEl) return;
+  if (cats) {
+    const current = catEl.value;
+    catEl.innerHTML = '<option value="">— Select —</option>';
+    for (const cat of cats) {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      catEl.appendChild(opt);
+    }
+    if (cats.includes(current)) catEl.value = current;
+    detailEl.style.display = 'none';
+    catEl.style.display = '';
+  } else {
+    detailEl.style.display = '';
+    catEl.style.display = 'none';
+  }
+}
+
+function initTrainingSlots() {
+  for (let i = 1; i <= 3; i++) updateClassModSlot(i);
+}
+
+function updateBonusDisplays() {
+  const fmt = id => {
+    const v = parseInt(getText(id), 10) || 0;
+    return v === 0 ? '—' : fmtMod(v);
+  };
+  setText('display-phys-attack', fmt('bonus-phys-attack'));
+  setText('display-phys-dmg',    fmt('bonus-phys-dmg'));
+  setText('display-ment-attack', fmt('bonus-ment-attack'));
+  setText('display-mag-dmg',     fmt('bonus-mag-dmg'));
+}
 
 function updateClassModifierBonuses() {
   for (const id of AUTO_BONUS_FIELDS) setValue(id, 0);
@@ -893,6 +1107,9 @@ function updateClassModifierBonuses() {
       if (el) el.value = (parseInt(el.value, 10) || 0) + amount;
     }
   }
+  updateBonusDisplays();
+  updateWeaponStats(1);
+  updateWeaponStats(2);
   updateDerivedStats();
 }
 
@@ -943,9 +1160,14 @@ document.addEventListener('DOMContentLoaded', function () {
     scheduleAutoSave();
   });
 
-  // Class modifier dropdowns — auto-fill bonus fields
+  // Class modifier dropdowns — handle training category UI and auto-fill bonuses
   for (let i = 1; i <= 3; i++) {
-    document.getElementById('class-mod-' + i + '-type')?.addEventListener('change', updateClassModifierBonuses);
+    const idx = i;
+    document.getElementById('class-mod-' + idx + '-type')?.addEventListener('change', function () {
+      updateClassModSlot(idx);
+      updateClassModifierBonuses();
+    });
+    document.getElementById('class-mod-' + idx + '-category')?.addEventListener('change', updateClassModifierBonuses);
   }
 
   // Magic toggle
@@ -1073,5 +1295,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   initCardToggles();
+  initTrainingSlots();
   loadFromLocalStorage();
 });

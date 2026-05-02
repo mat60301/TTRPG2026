@@ -54,7 +54,8 @@ Modifiers may be selected more than once — all stack freely. The 3-pick budget
 | Mental Damage Mitigation  | +1 to Mental Mitigation                             |
 | Physical Damage           | +1 to physical damage                               |
 | Magical Damage            | +1 to magical damage                                |
-| Attack Bonus              | +1 to physical or magical attack rolls              |
+| Physical Attack Bonus     | +1 to physical attack rolls                         |
+| Mental Attack Bonus       | +1 to magical attack rolls                          |
 | Resolve                   | +2 to Resolve                                       |
 | Resonance                 | +1 to Resonance                                     |
 | Additional Specialization | Gain 1 extra specialization                         |

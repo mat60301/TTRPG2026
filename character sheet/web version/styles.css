@@ -377,6 +377,34 @@ textarea {
   padding-top: 10px;
 }
 
+.trait-bonuses {
+  border-top: 1px solid #dde1e9;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.trait-bonus-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+
+.trait-bonus-label {
+  font-size: 12px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.trait-bonus-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c4a7c;
+  min-width: 36px;
+  text-align: right;
+  cursor: help;
+}
+
 .trait-group-label {
   font-size: 11px;
   font-weight: 700;
@@ -605,6 +633,10 @@ textarea {
 }
 
 .class-mod-detail {
+  flex: 1;
+}
+
+.class-mod-category {
   flex: 1;
 }
 

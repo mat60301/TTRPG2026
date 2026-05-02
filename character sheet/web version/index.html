@@ -87,7 +87,8 @@
             <option>Mental Damage Mitigation</option>
             <option>Physical Damage</option>
             <option>Magical Damage</option>
-            <option>Attack Bonus</option>
+            <option>Physical Attack Bonus</option>
+            <option>Mental Attack Bonus</option>
             <option>Resolve</option>
             <option>Resonance</option>
             <option>Additional Specialization</option>
@@ -96,7 +97,8 @@
             <option>Charm Training</option>
             <option>Shield Training</option>
           </select>
-          <input type="text" id="class-mod-1-detail" class="class-mod-detail" placeholder="Details (e.g. Weapon Training — melee, standard)">
+          <input type="text" id="class-mod-1-detail" class="class-mod-detail" placeholder="Details">
+          <select id="class-mod-1-category" class="class-mod-category" style="display:none"></select>
         </div>
         <div class="class-mod-row">
           <span class="class-mod-num">2</span>
@@ -107,7 +109,8 @@
             <option>Mental Damage Mitigation</option>
             <option>Physical Damage</option>
             <option>Magical Damage</option>
-            <option>Attack Bonus</option>
+            <option>Physical Attack Bonus</option>
+            <option>Mental Attack Bonus</option>
             <option>Resolve</option>
             <option>Resonance</option>
             <option>Additional Specialization</option>
@@ -117,6 +120,7 @@
             <option>Shield Training</option>
           </select>
           <input type="text" id="class-mod-2-detail" class="class-mod-detail" placeholder="Details">
+          <select id="class-mod-2-category" class="class-mod-category" style="display:none"></select>
         </div>
         <div class="class-mod-row">
           <span class="class-mod-num">3</span>
@@ -127,7 +131,8 @@
             <option>Mental Damage Mitigation</option>
             <option>Physical Damage</option>
             <option>Magical Damage</option>
-            <option>Attack Bonus</option>
+            <option>Physical Attack Bonus</option>
+            <option>Mental Attack Bonus</option>
             <option>Resolve</option>
             <option>Resonance</option>
             <option>Additional Specialization</option>
@@ -137,6 +142,7 @@
             <option>Shield Training</option>
           </select>
           <input type="text" id="class-mod-3-detail" class="class-mod-detail" placeholder="Details">
+          <select id="class-mod-3-category" class="class-mod-category" style="display:none"></select>
         </div>
       </div>
     </section>
@@ -214,6 +220,16 @@
                 </select>
               </div>
             </div>
+            <div class="trait-bonuses">
+              <div class="trait-bonus-row">
+                <span class="trait-bonus-label">Attack Bonus</span>
+                <span class="trait-bonus-value" id="display-phys-attack">—</span>
+              </div>
+              <div class="trait-bonus-row">
+                <span class="trait-bonus-label">Damage Bonus</span>
+                <span class="trait-bonus-value" id="display-phys-dmg">—</span>
+              </div>
+            </div>
           </div><!-- /traits-col physical -->
 
           <div class="traits-col">
@@ -268,6 +284,16 @@
                 <select id="trait-empathy-die" class="trait-die">
                   <option>d4</option><option>d6</option><option>d8</option><option>d10</option><option>d12</option>
                 </select>
+              </div>
+            </div>
+            <div class="trait-bonuses">
+              <div class="trait-bonus-row">
+                <span class="trait-bonus-label">Attack Bonus</span>
+                <span class="trait-bonus-value" id="display-ment-attack">—</span>
+              </div>
+              <div class="trait-bonus-row">
+                <span class="trait-bonus-label">Damage Bonus</span>
+                <span class="trait-bonus-value" id="display-mag-dmg">—</span>
               </div>
             </div>
           </div><!-- /traits-col mental -->
@@ -351,8 +377,12 @@
                 <input type="number" id="bonus-mag-dmg" class="bonus-input" value="0">
               </div>
               <div class="bonus-field">
-                <label for="bonus-attack">+Attack</label>
-                <input type="number" id="bonus-attack" class="bonus-input" value="0">
+                <label for="bonus-phys-attack">+Phys Atk</label>
+                <input type="number" id="bonus-phys-attack" class="bonus-input" value="0">
+              </div>
+              <div class="bonus-field">
+                <label for="bonus-ment-attack">+Ment Atk</label>
+                <input type="number" id="bonus-ment-attack" class="bonus-input" value="0">
               </div>
               <div class="bonus-field">
                 <label for="bonus-resolve">+Resolve</label>
