@@ -27,6 +27,143 @@ This file is updated at the end of each Claude chat session via `/handoff`. A ne
 
 ---
 
+## [Session 10] — May 2, 2026
+
+### Completed This Session
+- ✅ **Rewrote balance-notes.md weapon viability analysis** — added correct attack and damage formulas prominently at top; full DPR tables for Str 4 attacker across all weapon categories, defense values (11/15/20), and mitigation levels (0/2/4/7) for both single-weapon and dual-wield configurations; breakeven analysis showing exactly when heavier weapons are better; armor penetration proposal fully modeled (Heavy −2 pen beats dual wield at Mit 7+; Brutal −4 pen beats dual wield at Mit 5+)
+- ✅ **Trait utility analysis** — mapped all 12 traits by mechanical "jobs": Balance and Empathy each do 3 things (defense + mitigation + Resonance); Endurance/Willpower do 2 things each (defense + Resolve multiplier); 5 of 6 attack traits (Strength, Finesse, Knowledge, Wisdom, Charisma) are mechanically single-purpose — only Speed has a secondary effect (Combat Speed); this asymmetry motivated the formula redesign
+- ✅ **Formula redesign: separated defense and mitigation traits** — each physical/mental defense trait now has one clear job:
+  - Physical Defense: **8 + Endurance + Balance + Level** (Toughness removed)
+  - Mental Defense: **8 + Willpower + Awareness + Level** (Empathy removed)
+  - Physical Mitigation: **Toughness** only (Balance removed)
+  - Mental Mitigation: **Empathy** only (Awareness removed)
+  - Design rationale: no more overlap; "Balance = harder to hit, Toughness = absorb damage" is clean and explainable; Balance/Empathy drop from 3 jobs to 2 (less overpowered); monsters have GM-assigned flat stats so player-vs-monster balance is GM-tuned regardless
+- ✅ **Updated 4 files** with new formulas:
+  - `docs/02-traits.md` — all 4 derived stat formula blocks
+  - `character sheet/web version/script.js` — `updateDerivedStats()` lines 114–117; all 4 formula popup cases (phys-def, ment-def, phys-mit, ment-mit)
+  - `docs/balance-notes.md` — formulas table, sample build numbers, matchup table recalculated
+  - `CLAUDE.md` — Core Formulas table at bottom
+
+### Formula Reference Numbers (New)
+| Build | Phys Def | Phys Mit |
+|-------|----------|----------|
+| Average (End 2, Bal 2, Tou 2) | **13** (was 15) | **2** (was 4) |
+| Dedicated defender (End 4, Bal 4, Tou 3) | **17** (was 20) | **3** (was 7) |
+
+The +8 base constant was NOT changed. Avg vs avg hit rate is now ~62.5% (was ~52.5%). This is accepted — slightly more hit-prone, and monsters are GM-tuned anyway.
+
+### Key Weapon Balance Findings (Corrected Analysis)
+*Attack formula: d20 + Trait Die + Trait Value + Acc ≥ Defense*
+*Damage formula: Weapon Die + Trait Die + Trait Value − Mitigation (min 1)*
+
+- Trait package (die + value) goes into BOTH attack and damage. Str 4/d4 contributes avg 6.5 to every roll.
+- Each weapon tier = exactly +1 avg damage, −5% hit rate. Heavier weapons win single-weapon DPR when hit rate > 5% × avg damage.
+- **Dual wield (Std+Simple) is structurally dominant** — Simple's +0 off-hand acc = same hit rate as Standard main-hand. At Def 15/Mit 0: dual wield does 81% more DPR than Heavy single.
+- At high mitigation (Mit 7), gap narrows to 25% — dual wield still wins without penetration.
+- **Armor penetration fix**: Heavy (−2 pen) beats dual wield at Mit 7+; Brutal (−4 pen) beats dual wield at Mit 5+. Clean niche hierarchy: unarmored → dual wield; standard armor → competitive; heavy armor → heavy/brutal.
+- Penetration rule NOT implemented yet — deferred to design decision.
+- Monster stats are GM-assigned, so weapon balance is a GM toolkit concern not a player constraint.
+
+### Currently In Progress
+- 🔄 **Session 10 changes are uncommitted** — run `/TTRPGCommit` to push
+
+### Next Steps (Priority Order)
+1. **Run `/TTRPGCommit`** to push Session 10 changes
+2. **Design decision: armor penetration for Heavy/Brutal** — simple rule, clean niche; implement or defer to playtest
+3. **Playtest** — sheet is functionally complete; primary remaining unknown is feel of the game at the table
+4. **GM Section** — encounter creation, monster building (GM assigns flat Defense/Mitigation/damage directly), reward/advancement guidelines
+5. **Print stylesheet** for the web character sheet
+
+### Blockers / Open Questions
+- Armor penetration for Heavy/Brutal not yet implemented (see balance-notes.md for full math)
+- Simple offAcc nerf analyzed — concluded it doesn't solve dual wield dominance; armor penetration is the better fix
+- The +8 base constant now produces 62.5% avg vs avg hit rate (was designed for 52.5%); accepted intentionally
+- GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
+
+### Design Decisions Made This Session
+- Defense and mitigation traits separated: Balance → defense only, Toughness → mitigation only, Awareness → defense only, Empathy → mitigation only
+- Kept +8 base constant (not raised to +10) — accepted that avg vs avg is now ~62.5%
+- Monster stats are GM-assigned flat values, not derived from trait formulas — weapon balance is a GM design tool, not a player constraint
+- Armor penetration deferred to explicit design decision before playtest
+
+### Files Modified This Session
+- `docs/balance-notes.md` — complete weapon viability rewrite + formula changes + recalculated sample builds
+- `docs/02-traits.md` — Physical/Mental Defense and Mitigation formula blocks
+- `character sheet/web version/script.js` — `updateDerivedStats()` + 4 formula popup cases
+- `CLAUDE.md` — Core Formulas table
+
+---
+
+## [Session 9] — May 1, 2026
+
+### Completed This Session
+- ✅ **Added weapon damage die to trait panel** — "Main Hand Weapon Damage" row inserted between Main Hand Attack Bonus and Main Hand Damage Bonus; "Off Hand Weapon Damage" between Off Hand Attack Bonus and Off Hand Damage Bonus; displays the weapon's die in "1d8" format (e.g. "1d8" for standard, "1d10" for heavy); shows "—" when no weapon equipped; wired to existing `weapon-N-dmg` formula popup
+- ✅ **Off-hand rows are now conditional** — "Off Hand Attack Bonus", "Off Hand Weapon Damage", and "Off Hand Damage Bonus" are wrapped in `#oh-bonus-section` and hidden (`display:none`) when no off-hand weapon is selected; appear automatically when weapon-2-cat is populated
+- ✅ **Equipment section shows raw values only** — removed training bonus calculation from `updateWeaponStats()`; Main Acc and Off Acc in the equipment card now show the base weapon-category stats (e.g. standard = +0 / −6) with no class modifier bonuses applied; training bonuses still apply correctly in the trait panel
+- ✅ **Equipment formula popups simplified** — `weapon-N-dmg`, `weapon-N-acc`, `weapon-N-off` formula cases rewritten to show only the three raw category stats (die, main acc, off acc); training rows and totals removed since equipment section is now informational-only
+- ✅ **Committed and pushed** — commit `59fd616`: "Add weapon damage die to trait panel, hide off-hand rows when no off-hand weapon equipped, show raw stats in equipment section"
+- ✅ **Full weapon balance math analysis** — ran detailed DPR calculations across weapon types, defense values (11/15/20), and mitigation levels (0/2/4/7), both with d20-only and with full trait die + trait value attack rolls
+
+### Weapon Balance Findings (Full Analysis)
+The math confirms heavy weapons are never the optimal choice. Key findings:
+
+**d20-only (naive) analysis:**
+- At def 15/mit 0: Std+Simple dual (2.10 DPR) >> Heavy (1.38); dual wield wins by 52%
+- Standard off-hand (−6 acc) = 0% hit rate at def 15 — useless without trait bonuses
+- Heavy/brutal can't hit def 20 at all (need 21+ on d20)
+- Brutal strictly beats heavy at any mitigation ≥ 1
+
+**With trait die + value (correct analysis):**
+Hit rates jump dramatically. With Str 4/d8 at def 15:
+- Standard main: 72.5%, Heavy: 67.5%, Standard off-hand: 42.5%, Light off-hand: 57.5%
+- Standard off-hand went from useless (0%) to meaningful (42.5%) — Std+Std dual wield is now real
+- DPR: Std+Std dual (5.17) >> Heavy (3.71) >> Standard alone (3.26)
+- At mit 4: Brutal (2.08) ≈ Std+Std (2.01) > Std+Simple (2.00) > Heavy (1.69)
+- At def 20: Heavy/brutal still can't hit; simple and light weapons dominate
+
+**Root cause:** Simple weapon's offAcc (+0) equals standard mainAcc (+0). Players get a near-free second attack scaling with their full trait bonus. This is the structural advantage of dual wield.
+
+**Proposed fixes (not yet implemented — deferred to design decision):**
+1. **Lower simple's offAcc to −2 or −3** — off-hand simple would still be viable but no longer free
+2. **Give heavy/brutal armor penetration** (e.g., heavy bypasses 2 mitigation) — creates a genuine anti-armor niche; at mit 4 with −2 pen (effective mit 2), heavy jumps to 0.95 DPR vs std+simple 0.83 — heavy wins
+3. **Heavy with training = one-handed + shield** (already in rules: "two-handed unless trained") — heavy+training+large shield: acc +0 net, d10+1 dmg, +4 def — compelling vs standard+shield (which does d8, +4 def, no class slot cost)
+4. **Brutal stays permanently two-handed** — the pure damage specialist; no shield ever
+
+### Files Modified This Session
+- `character sheet/web version/index.html` — added `display-mh-weapon-dmg` and `display-oh-weapon-dmg` rows; wrapped off-hand bonus rows in `#oh-bonus-section` with `style="display:none"`
+- `character sheet/web version/script.js` — `updateWeaponStats()` simplified (raw values only); `updateBonusDisplays()` sets weapon die displays and controls `#oh-bonus-section` visibility; `FORMULA_MAP` entries for new weapon die displays; `weapon-N-dmg/acc/off` formula cases simplified to raw stats
+
+### Currently In Progress
+- 🔄 **Open design decisions from balance analysis** — none implemented yet, all deferred:
+  - Simple offAcc nerf (−2 or −3 instead of +0)
+  - Heavy/brutal armor penetration rule
+  - Confirm/codify "heavy two-handed unless trained" mechanic (already in rules, not yet enforced in sheet)
+
+### Next Steps (Priority Order)
+1. **Design decision: fix simple's offAcc** — change from +0 to −2 or −3 to reduce dual wield dominance; this is the single highest-leverage balance change
+2. **Design decision: armor penetration for heavy/brutal** — optional rule giving heavy "ignore 2 mitigation" and brutal "ignore 4 mitigation"; would make them genuinely competitive vs armored targets
+3. **Playtest first, fix after** — alternatively, play a session before changing anything; the math predicts problems but real play may feel different
+4. **GM Section** — encounter creation, monster building, reward/advancement (blocked until core mechanics validated)
+5. **Review balance-notes.md** after first playtest and adjust
+6. **Print stylesheet** for the web character sheet
+
+### Blockers / Open Questions
+- Simple offAcc (+0) makes dual wield structurally dominant — needs design decision before playtest or at least awareness during playtest
+- Heavy weapons have no niche where they're mathematically optimal (brutal beats them for 2H damage; dual wield beats both for offense; standard+shield beats them defensively)
+- The "heavy two-handed unless trained" rule exists in docs but isn't surfaced mechanically on the sheet
+- Non-magical bonus (4 extra specs = 6 total) still an estimate — needs table validation
+- Bypass Immunity cost (4 Resonance) deferred to playtesting
+- Resonance refund on "succeed by 5+" deferred to playtesting
+- GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
+
+### Design Decisions Made This Session
+- Equipment section = raw informational reference only; all bonus calculations live in the trait panel
+- Off-hand bonus rows hide when slot is empty — reduces visual clutter for single-weapon characters
+- Weapon damage die displayed in "1d8" format in trait panel (not "d8" as in equipment section)
+- Balance analysis complete; no rule changes made yet — deferred to playtest or explicit design session
+
+---
+
 ## [Session 8] — May 1, 2026
 
 ### Completed This Session
@@ -513,10 +650,10 @@ character sheet/
 
 | Stat | Formula |
 |------|---------|
-| Physical Defense | 8 + Endurance + Balance + Toughness + Level |
-| Mental Defense | 8 + Willpower + Awareness + Empathy + Level |
-| Physical Mitigation | Balance + Toughness |
-| Mental Mitigation | Awareness + Empathy |
+| Physical Defense | 8 + Endurance + Balance + Level |
+| Mental Defense | 8 + Willpower + Awareness + Level |
+| Physical Mitigation | Toughness |
+| Mental Mitigation | Empathy |
 | Resolve | (Endurance × Willpower) + Level |
 | Resonance | Empathy + Balance + Level |
 | Combat Speed | 20 ft base + 5 ft per 2 Speed (rounded down) |

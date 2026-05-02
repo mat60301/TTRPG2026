@@ -111,10 +111,10 @@ function updateDerivedStats() {
   const training = getTrainingBonuses();
 
   // Formulas
-  const physDef    = 8 + end + bal + tou + level + armor.defMod + shield.def + bPhysDef + training.physDef;
-  const mentDef    = 8 + wil + awr + emp + level + charm.defMod + bMentDef + training.mentDef;
-  const physMit    = bal + tou + armor.mit + bPhysMit + training.physMit;
-  const mentMit    = awr + emp + charm.mit + bMentMit + training.mentMit;
+  const physDef    = 8 + end + bal + level + armor.defMod + shield.def + bPhysDef + training.physDef;
+  const mentDef    = 8 + wil + awr + level + charm.defMod + bMentDef + training.mentDef;
+  const physMit    = tou + armor.mit + bPhysMit + training.physMit;
+  const mentMit    = emp + charm.mit + bMentMit + training.mentMit;
   const resolveMax = (end * wil) + level + bResolve;
   const resonanceMax = emp + bal + level + bResonance;
   const combatSpeed  = 20 + Math.floor(spd / 2) * 5 + bSpeed;
@@ -676,13 +676,13 @@ function buildFormulaContent(key) {
         if (mType === 'Armor Training'  && armorCat   !== 'none' && armorCat   === mCat) trainingRows += r('Armor Training (Mod '  + i + ')', 1);
         if (mType === 'Shield Training' && shieldSize  !== 'none' && shieldSize  === mCat) trainingRows += r('Shield Training (Mod ' + i + ')', 1);
       }
-      const total = 8 + end + bal + tou + level + armor.defMod + shield.def + bPhysDef + training.physDef;
+      const total = 8 + end + bal + level + armor.defMod + shield.def + bPhysDef + training.physDef;
       return {
         title: 'Physical Defense',
-        eq: '8 + Endurance + Balance + Toughness + Level\n+ Armor Def Mod + Shield Def + Class Bonus + Training',
+        eq: '8 + Endurance + Balance + Level\n+ Armor Def Mod + Shield Def + Class Bonus + Training',
         body: tbl(
           '<tr><td>Base</td><td>+8</td></tr>' +
-          r('Endurance', end) + r('Balance', bal) + r('Toughness', tou) +
+          r('Endurance', end) + r('Balance', bal) +
           r('Level', level) +
           r('Armor Def Mod', armor.defMod, armorCat) +
           r('Shield Def', shield.def, shieldSize) +
@@ -699,13 +699,13 @@ function buildFormulaContent(key) {
         const mCat  = getText('class-mod-' + i + '-category') || '';
         if (mType === 'Charm Training' && charmCat !== 'none' && charmCat === mCat) trainingRows += r('Charm Training (Mod ' + i + ')', 1);
       }
-      const total = 8 + wil + awr + emp + level + charm.defMod + bMentDef + training.mentDef;
+      const total = 8 + wil + awr + level + charm.defMod + bMentDef + training.mentDef;
       return {
         title: 'Mental Defense',
-        eq: '8 + Willpower + Awareness + Empathy + Level\n+ Charm Def Mod + Class Bonus + Training',
+        eq: '8 + Willpower + Awareness + Level\n+ Charm Def Mod + Class Bonus + Training',
         body: tbl(
           '<tr><td>Base</td><td>+8</td></tr>' +
-          r('Willpower', wil) + r('Awareness', awr) + r('Empathy', emp) +
+          r('Willpower', wil) + r('Awareness', awr) +
           r('Level', level) +
           r('Charm Def Mod', charm.defMod, charmCat) +
           r('Class Bonus', bMentDef) +
@@ -721,12 +721,12 @@ function buildFormulaContent(key) {
         const mCat  = getText('class-mod-' + i + '-category') || '';
         if (mType === 'Armor Training' && armorCat !== 'none' && armorCat === mCat) trainingRows += r('Armor Training (Mod ' + i + ')', 1);
       }
-      const total = bal + tou + armor.mit + bPhysMit + training.physMit;
+      const total = tou + armor.mit + bPhysMit + training.physMit;
       return {
         title: 'Physical Mitigation',
-        eq: 'Balance + Toughness + Armor Mitigation + Class Bonus + Training',
+        eq: 'Toughness + Armor Mitigation + Class Bonus + Training',
         body: tbl(
-          r('Balance', bal) + r('Toughness', tou) +
+          r('Toughness', tou) +
           r('Armor Mitigation', armor.mit, armorCat) +
           r('Class Bonus', bPhysMit) +
           trainingRows +
@@ -741,12 +741,12 @@ function buildFormulaContent(key) {
         const mCat  = getText('class-mod-' + i + '-category') || '';
         if (mType === 'Charm Training' && charmCat !== 'none' && charmCat === mCat) trainingRows += r('Charm Training (Mod ' + i + ')', 1);
       }
-      const total = awr + emp + charm.mit + bMentMit + training.mentMit;
+      const total = emp + charm.mit + bMentMit + training.mentMit;
       return {
         title: 'Mental Mitigation',
-        eq: 'Awareness + Empathy + Charm Mitigation + Class Bonus + Training',
+        eq: 'Empathy + Charm Mitigation + Class Bonus + Training',
         body: tbl(
-          r('Awareness', awr) + r('Empathy', emp) +
+          r('Empathy', emp) +
           r('Charm Mitigation', charm.mit, charmCat) +
           r('Class Bonus', bMentMit) +
           trainingRows +

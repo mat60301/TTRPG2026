@@ -77,22 +77,22 @@ The type of attack (physical vs. mental) is determined by the player's intent. T
 ### Physical Defense
 The target number an attacker must meet to land a physical hit.
 
-**Physical Defense = 8 + Endurance + Balance + Toughness + Level**
+**Physical Defense = 8 + Endurance + Balance + Level**
 
 ### Mental Defense
 The target number an attacker must meet to land a mental or magical hit.
 
-**Mental Defense = 8 + Willpower + Awareness + Empathy + Level**
+**Mental Defense = 8 + Willpower + Awareness + Level**
 
 ### Physical Mitigation
 Reduces damage taken from physical hits. Does not apply to ongoing damage unless otherwise stated.
 
-**Physical Mitigation = Balance + Toughness**
+**Physical Mitigation = Toughness**
 
 ### Mental Mitigation
 Reduces damage taken from mental or magical hits. Does not apply to ongoing damage unless otherwise stated.
 
-**Mental Mitigation = Awareness + Empathy**
+**Mental Mitigation = Empathy**
 
 ### Resolve
 Represents a character's ability to withstand harm, stress, and fatigue. Replaces traditional hit points.
