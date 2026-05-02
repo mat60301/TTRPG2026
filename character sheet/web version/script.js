@@ -5,12 +5,12 @@
 // =====================
 
 const WEAPON_STATS = {
-  simple:   { dmg: 'd4',   mainAcc: '+2', offAcc: '+0' },
-  light:    { dmg: 'd6',   mainAcc: '+1', offAcc: '−3' },
-  standard: { dmg: 'd8',   mainAcc: '+0', offAcc: '−6' },
-  heavy:    { dmg: 'd10',  mainAcc: '−1', offAcc: '—' },
-  brutal:   { dmg: 'd12',  mainAcc: '−2', offAcc: '—' },
-  unarmed:  { dmg: 'None', mainAcc: '+4', offAcc: '+3' },
+  simple:   { dmg: 'd4',   mainAcc: '+2', offAcc: '+0', pen: 0 },
+  light:    { dmg: 'd6',   mainAcc: '+1', offAcc: '−3', pen: 0 },
+  standard: { dmg: 'd8',   mainAcc: '+0', offAcc: '−6', pen: 0 },
+  heavy:    { dmg: 'd10',  mainAcc: '−1', offAcc: '—',  pen: 2 },
+  brutal:   { dmg: 'd12',  mainAcc: '−2', offAcc: '—',  pen: 4 },
+  unarmed:  { dmg: 'None', mainAcc: '+4', offAcc: '+3', pen: 0 },
 };
 
 const ARMOR_STATS = {
@@ -141,10 +141,12 @@ function updateWeaponStats(n) {
     setText('weapon-' + n + '-dmg',      stats.dmg);
     setText('weapon-' + n + '-main-acc', stats.mainAcc);
     setText('weapon-' + n + '-off-acc',  stats.offAcc);
+    setText('weapon-' + n + '-pen-label', stats.pen > 0 ? '✦ Pen ' + stats.pen : '');
   } else {
     setText('weapon-' + n + '-dmg',      '—');
     setText('weapon-' + n + '-main-acc', '—');
     setText('weapon-' + n + '-off-acc',  '—');
+    setText('weapon-' + n + '-pen-label', '');
   }
 }
 
@@ -809,7 +811,10 @@ function buildFormulaContent(key) {
           ? '<p class="fm-cat">Category: <strong>' + wCat + '</strong></p>' +
             tbl('<tr><td>Damage Die</td><td>' + stats.dmg + '</td></tr>' +
                 '<tr><td>Main-hand Accuracy</td><td>' + stats.mainAcc + '</td></tr>' +
-                '<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>')
+                '<tr><td>Off-hand Accuracy</td><td>' + stats.offAcc + '</td></tr>' +
+                (stats.pen > 0
+                  ? '<tr><td>Penetration</td><td>−' + stats.pen + ' target mitigation</td></tr>'
+                  : ''))
           : '<p class="fm-empty">No weapon category selected.</p>'
       };
     }

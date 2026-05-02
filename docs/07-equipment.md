@@ -5,16 +5,18 @@
 ### Weapon Categories
 Weapons determine damage die (volatility), accuracy modifier (reliability), and category (used for training and shield restrictions).
 
-| Category | Main Hand Accuracy | Off Hand Accuracy | Damage Die | Notes |
-|----------|--------------------|-------------------|------------|-------|
-| Simple   | +2                 | +0                | d4         |       |
-| Light    | +1                 | −3                | d6         |       |
-| Standard | 0                  | −6                | d8         |       |
-| Heavy    | −1                 | —                 | d10        | Two-handed unless trained |
-| Brutal   | −2                 | —                 | d12        | Always two-handed; on a successful hit, applies a minor condition appropriate to the weapon (e.g. Bleeding for a greatsword, Prone or Staggered for a hammer). The condition is defined when the weapon is acquired and approved by the GM. |
-| Unarmed  | +4                 | +3                | None       | Does not use a weapon die |
+| Category | Main Hand Accuracy | Off Hand Accuracy | Damage Die | Penetration | Notes |
+|----------|--------------------|-------------------|------------|-------------|-------|
+| Simple   | +2                 | +0                | d4         | —           |       |
+| Light    | +1                 | −3                | d6         | —           |       |
+| Standard | 0                  | −6                | d8         | —           |       |
+| Heavy    | −1                 | —                 | d10        | −2          | Two-handed unless trained |
+| Brutal   | −2                 | —                 | d12        | −4          | Always two-handed; on a successful hit, applies a minor condition appropriate to the weapon (e.g. Bleeding for a greatsword, Prone or Staggered for a hammer). The condition is defined when the weapon is acquired and approved by the GM. |
+| Unarmed  | +4                 | +3                | None       | —           | Does not use a weapon die |
 
 Heavy and Brutal weapons have no off-hand value because they cannot be wielded in one hand (Heavy requires training to use single-handed).
+
+**Penetration** reduces the target's effective mitigation for that attack. A Heavy weapon (Penetration −2) treats a target with 5 Physical Mitigation as if it has 3. Penetration cannot reduce effective mitigation below 0.
 
 ### Weapon Training (Class Modifier)
 Each instance applies to one weapon category (must specify melee **or** ranged):

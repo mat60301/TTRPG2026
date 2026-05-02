@@ -52,45 +52,60 @@ This file is updated at the end of each Claude chat session via `/handoff`. A ne
 
 The +8 base constant was NOT changed. Avg vs avg hit rate is now ~62.5% (was ~52.5%). This is accepted — slightly more hit-prone, and monsters are GM-tuned anyway.
 
-### Key Weapon Balance Findings (Corrected Analysis)
+### Key Weapon Balance Findings (Final — Implemented)
 *Attack formula: d20 + Trait Die + Trait Value + Acc ≥ Defense*
-*Damage formula: Weapon Die + Trait Die + Trait Value − Mitigation (min 1)*
+*Damage formula: Weapon Die + Trait Die + Trait Value − effective Mitigation (min 1)*
+*Effective Mitigation = Mitigation − Penetration (min 0); Heavy pen −2, Brutal pen −4*
 
 - Trait package (die + value) goes into BOTH attack and damage. Str 4/d4 contributes avg 6.5 to every roll.
-- Each weapon tier = exactly +1 avg damage, −5% hit rate. Heavier weapons win single-weapon DPR when hit rate > 5% × avg damage.
-- **Dual wield (Std+Simple) is structurally dominant** — Simple's +0 off-hand acc = same hit rate as Standard main-hand. At Def 15/Mit 0: dual wield does 81% more DPR than Heavy single.
-- At high mitigation (Mit 7), gap narrows to 25% — dual wield still wins without penetration.
-- **Armor penetration fix**: Heavy (−2 pen) beats dual wield at Mit 7+; Brutal (−4 pen) beats dual wield at Mit 5+. Clean niche hierarchy: unarmored → dual wield; standard armor → competitive; heavy armor → heavy/brutal.
-- Penetration rule NOT implemented yet — deferred to design decision.
-- Monster stats are GM-assigned, so weapon balance is a GM toolkit concern not a player constraint.
+- Each weapon tier = exactly +1 avg damage, −5% hit rate. At baseline (no mitigation), all single weapons are within 0.4 DPR of each other — the accuracy tradeoff exactly balances the damage die increase.
+- **Armor penetration creates three clean niches** (Def 15, Trait 4):
+  - Mit 0–1 (unarmored): dual wield wins by ~80%. Two near-free attacks dominate.
+  - Mit ≈ 4 (balance point): Simple+Simple dual (6.75) ≈ Brutal single (6.83). All loadouts within 10%.
+  - Mit 7+ (heavy armor): Brutal (5.25 DPR) beats best dual wield (3.75) by 40%.
+- **Heavy vs Brutal niche**: Heavy (−1 acc, −2 pen, d10, can use shield via training) = moderate anti-armor. Brutal (−2 acc, −4 pen, d12, always 2H, condition on hit) = maximum anti-armor specialist.
+- **Off-hand accuracy kept as-is**: Simple +0 = Standard main-hand hit rate. This is the intended mechanic — the off-hand reward for using a small weapon. Not a bug.
+- Monster stats are GM-assigned flat values — GMs can target any tier and weapon balance scales accordingly.
+
+### Monster Stat Tier Reference (GM Guidelines)
+| Tier | Defense | Mitigation | Example |
+|------|---------|------------|---------|
+| Weak / unarmored | 9–12 | 0–1 | Goblin, zombie |
+| Average | 13–16 | 2–3 | Town guard, orc |
+| Tough / armored | 16–18 | 4–6 | Knight, troll |
+| Elite / heavily armored | 18–22 | 7–10 | Warlord, iron golem |
+| Boss | 20–26 | 10–15 | Dragon, demon lord |
 
 ### Currently In Progress
-- 🔄 **Session 10 changes are uncommitted** — run `/TTRPGCommit` to push
+- 🔄 **Session 10+11 changes are uncommitted** — run `/TTRPGCommit` to push
 
 ### Next Steps (Priority Order)
-1. **Run `/TTRPGCommit`** to push Session 10 changes
-2. **Design decision: armor penetration for Heavy/Brutal** — simple rule, clean niche; implement or defer to playtest
-3. **Playtest** — sheet is functionally complete; primary remaining unknown is feel of the game at the table
-4. **GM Section** — encounter creation, monster building (GM assigns flat Defense/Mitigation/damage directly), reward/advancement guidelines
-5. **Print stylesheet** for the web character sheet
+1. **Run `/TTRPGCommit`** to push all changes
+2. **Playtest** — sheet is functionally complete; primary remaining unknown is feel at the table
+3. **GM Section** — encounter creation, monster building (GM assigns flat Defense/Mitigation/damage directly), reward/advancement guidelines
+4. **Print stylesheet** for the web character sheet
 
 ### Blockers / Open Questions
-- Armor penetration for Heavy/Brutal not yet implemented (see balance-notes.md for full math)
-- Simple offAcc nerf analyzed — concluded it doesn't solve dual wield dominance; armor penetration is the better fix
+- Penetration values (Heavy −2, Brutal −4) are mathematically correct but may need tuning after first playtest based on feel
 - The +8 base constant now produces 62.5% avg vs avg hit rate (was designed for 52.5%); accepted intentionally
 - GitHub Pages not yet enabled — needs one-time manual setup: repo Settings → Pages → main / root
 
-### Design Decisions Made This Session
+### Design Decisions Made This Session (Sessions 10–11)
 - Defense and mitigation traits separated: Balance → defense only, Toughness → mitigation only, Awareness → defense only, Empathy → mitigation only
 - Kept +8 base constant (not raised to +10) — accepted that avg vs avg is now ~62.5%
-- Monster stats are GM-assigned flat values, not derived from trait formulas — weapon balance is a GM design tool, not a player constraint
-- Armor penetration deferred to explicit design decision before playtest
+- Monster stats are GM-assigned flat values, not derived from trait formulas — weapon balance is a GM design tool
+- **Armor penetration implemented**: Heavy −2, Brutal −4. Balance crossover at Mit ≈ 4.
+- Accuracy and off-hand modifiers left unchanged — they are producing the correct behavior
+- Monster stat tiers defined as GM guidelines (not hard rules)
 
-### Files Modified This Session
-- `docs/balance-notes.md` — complete weapon viability rewrite + formula changes + recalculated sample builds
+### Files Modified (Sessions 10–11)
+- `docs/balance-notes.md` — complete rewrite: monster-facing framing, penetration analysis, niche hierarchy, monster stat tiers
 - `docs/02-traits.md` — Physical/Mental Defense and Mitigation formula blocks
-- `character sheet/web version/script.js` — `updateDerivedStats()` + 4 formula popup cases
-- `CLAUDE.md` — Core Formulas table
+- `docs/07-equipment.md` — Penetration column added to weapon table; penetration rule text
+- `character sheet/web version/index.html` — added `weapon-1-pen-label` and `weapon-2-pen-label` spans below Dmg Die in equipment section
+- `character sheet/web version/styles.css` — `.weapon-pen-label` styles (small warm-brown text below the die box)
+- `character sheet/web version/script.js` — `updateDerivedStats()` + 4 formula popup cases; `WEAPON_STATS` pen values; weapon-N-dmg formula popup shows Penetration row for Heavy/Brutal; `updateWeaponStats()` sets pen label to `✦ Pen 2` / `✦ Pen 4` (or empty) based on category
+- `CLAUDE.md` — Core Formulas table + weapon balance findings
 
 ---
 

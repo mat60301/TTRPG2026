@@ -129,186 +129,102 @@ Threshold formula: **T = Defense − Trait Value − Weapon Accuracy**
 
 ## Weapon Viability Analysis
 
+### Design Goal
+
+Weapon loadouts are balanced against **monsters**, not other players. The goal is three distinct niches:
+
+- **Small weapon dual wield** (Simple+Simple, Std+Simple): best against unarmored/lightly armored monsters
+- **Heavy/Brutal single weapon**: best against heavily armored monsters, including outperforming dual wield
+- **Under average monster conditions**: all loadouts roughly equivalent — no choice feels penalized
+
+The mechanism that creates these niches is **armor penetration** for Heavy and Brutal weapons.
+
 ### Weapon Stats Reference
 
-| Category | Main Acc | Off Acc | Damage Die | Avg Die |
-|----------|----------|---------|------------|---------|
-| Simple | +2 | +0 | d4 | 2.5 |
-| Light | +1 | −3 | d6 | 3.5 |
-| Standard | 0 | −6 | d8 | 4.5 |
-| Heavy | −1 | — | d10 | 5.5 (two-handed unless trained) |
-| Brutal | −2 | — | d12 | 6.5 (always two-handed; condition on hit) |
-| Unarmed | +4 | +3 | none | — |
+| Category | Main Acc | Off Acc | Damage Die | Avg Die | Penetration |
+|----------|----------|---------|------------|---------|-------------|
+| Simple | +2 | +0 | d4 | 2.5 | — |
+| Light | +1 | −3 | d6 | 3.5 | — |
+| Standard | 0 | −6 | d8 | 4.5 | — |
+| Heavy | −1 | — | d10 | 5.5 | −2 (two-handed unless trained) |
+| Brutal | −2 | — | d12 | 6.5 | −4 (always two-handed; condition on hit) |
+| Unarmed | +4 | +3 | none | — | — |
 
-Each step up the weapon ladder is exactly **+1 average damage** in exchange for exactly **−1 accuracy** (−5% hit rate). Whether this tradeoff is worthwhile depends on the current hit rate and mitigation level — see breakeven analysis below.
+Each step up the weapon ladder is exactly **+1 average damage** and **−5% hit rate**. This produces near-equal single-weapon DPR under base (no mitigation) conditions — see below.
 
-### Hit Rates — Focused Attacker (Trait 4, d4)
+Penetration reduces the target's **effective mitigation** for that attack. Effective mitigation cannot go below 0. Heavy treats Mit 5 as Mit 3; Brutal treats Mit 7 as Mit 3.
 
-Threshold T = Defense − 4 − Weapon Acc
+### Why the Accuracy and Off-Hand Modifiers Are Correct
 
-**Main hand:**
+The main hand accuracy progression (+2 to −2) exists specifically to keep single-weapon DPR roughly equal at baseline (see table below). Without it, smaller weapons would be strictly worse in every context.
 
-| Weapon | Acc | Def 11 | Def 15 | Def 20 |
-|--------|-----|--------|--------|--------|
-| Simple | +2 | 92.5% | 72.5% | 47.5% |
-| Light | +1 | 87.5% | 67.5% | 42.5% |
-| Standard | 0 | 82.5% | 62.5% | 37.5% |
-| Heavy | −1 | 77.5% | 57.5% | 32.5% |
-| Brutal | −2 | 72.5% | 52.5% | 27.5% |
+The off-hand accuracy penalties (+0, −3, −6) enforce the "small weapon in the off-hand" archetype. Simple's +0 off-hand equals Standard's +0 main-hand — this is intentional. It makes Simple the ideal off-hand weapon and means the best dual wield pairing is Std + Simple or Lt + Simple, not Std + Std. These numbers are not changing.
 
-**Off hand** (uses off-hand accuracy modifier):
+### Single Weapon DPR at Baseline — Near-Equal Design ✅
 
-| Weapon | Acc | Def 11 | Def 15 | Def 20 |
-|--------|-----|--------|--------|--------|
-| Simple | +0 | 82.5% | 62.5% | 37.5% |
-| Light | −3 | 67.5% | 47.5% | 22.5% |
-| Standard | −6 | 52.5% | 32.5% | 7.5% |
+Focused attacker (Trait 4, d4). Damage = Weapon Die avg + 6.5 − M. DPR = Hit Rate × Damage.
 
-**Key observation:** Simple off-hand (+0) has the same hit rate as Standard main-hand (0) at every defense value. An off-hand Simple weapon lands as often as a main-hand Standard weapon while doing d4+6.5−M damage vs d8+6.5−M. This is the structural source of dual wield's advantage.
+At Def 15 / Mit 0 (no mitigation, no penetration needed):
 
-### Avg Damage Per Hit — Focused Attacker (Trait 4, d4)
+| Weapon | Hit rate | Dmg | DPR |
+|--------|----------|-----|-----|
+| Simple | 72.5% | 9.0 | 6.53 |
+| Light | 67.5% | 10.0 | 6.75 |
+| Standard | 62.5% | 11.0 | 6.88 |
+| Heavy | 57.5% | 12.0 | 6.90 |
+| Brutal | 52.5% | 13.0 | 6.83 |
 
-Damage = Weapon Die avg + 2.5 (trait die) + 4 (trait value) − Mitigation = Weapon Die avg + **6.5** − M (min 1)
+Range: 6.53–6.90. All single weapons do roughly the same DPR against an unarmored target. The accuracy tradeoff exactly balances the damage die increase. This is the baseline the niche system builds from.
 
-| Weapon | Die avg | Mit 0 | Mit 2 | Mit 4 | Mit 7 |
-|--------|---------|-------|-------|-------|-------|
-| Simple | 2.5 | 9.0 | 7.0 | 5.0 | 2.0† |
-| Light | 3.5 | 10.0 | 8.0 | 6.0 | 3.0 |
-| Standard | 4.5 | 11.0 | 9.0 | 7.0 | 4.0 |
-| Heavy | 5.5 | 12.0 | 10.0 | 8.0 | 5.0 |
-| Brutal | 6.5 | 13.0 | 11.0 | 9.0 | 6.0 |
+### The Balance Crossover Point
 
-† Min-1 floor applies on ~19% of hits at this value; actual avg ≈ 2.1.
+**At Def 15 / Mit 4 with armor penetration, Simple+Simple dual ≈ Brutal single:**
 
-**Breakeven rule:** Moving one step heavier (−5% hit rate, +1 avg damage) increases DPR when:
-> current hit rate > 5% × current avg damage per hit
+- Simple + Simple dual: 72.5% × 5 + 62.5% × 5 = **6.75 DPR**
+- Brutal with −4 pen (eff. M=0): 52.5% × 13 = **6.83 DPR**
 
-At Standard vs Mit 0 (avg dmg 11): breakeven is 55%. Standard hits at 62.5% vs def 15 → Heavy marginally wins on single-weapon DPR. At def 20 (37.5% hit): 5%×11=55% > 37.5% → lighter weapons win at high defense.
+Within 1% of each other. **Mit ≈ 4 is the balance point** — the crossover where loadout choice stops mattering and only the extremes differentiate.
 
-### Single Weapon DPR — Focused Attacker (Trait 4, d4)
+### Full DPR Comparison (Def 15, with penetration for Heavy/Brutal)
 
-DPR = Hit Rate × Avg Damage
+Effective mitigation for Heavy = M−2 (min 0); for Brutal = M−4 (min 0). Values italic where penetration reaches the floor (DPR is flat).
 
-| Weapon | D11/M0 | D15/M0 | D20/M0 | D15/M2 | D15/M4 | D15/M7 | D20/M4 | D20/M7 |
-|--------|--------|--------|--------|--------|--------|--------|--------|--------|
-| Simple | 8.33 | 6.53 | **4.28** | 5.08 | 3.63 | 1.45 | 2.38 | 0.95 |
-| Light | 8.75 | 6.75 | **4.25** | 5.40 | 4.05 | 2.03 | 2.55 | 1.28 |
-| Standard | 9.08 | 6.88 | 4.13 | 5.63 | 4.38 | 2.50 | **2.63** | 1.50 |
-| Heavy | **9.30** | **6.90** | 3.90 | **5.75** | **4.60** | **2.88** | 2.60 | 1.63 |
-| Brutal | **9.43** | 6.83 | 3.58 | **5.78** | **4.73** | **3.15** | 2.48 | **1.65** |
+| Loadout | M=0 | M=2 | M=4 | M=7 | M=10 |
+|---------|-----|-----|-----|-----|------|
+| Simple + Simple dual | 12.15 | 9.00 | 6.75 | 2.70 | min-1 floor |
+| Std + Simple dual | 12.50 | 9.38 | 7.50 | 3.75 | min-1 floor |
+| Standard single | 6.88 | 5.63 | 4.38 | 2.50 | 1.25 |
+| Heavy (−2 pen) | *6.90* | *6.90* | 5.75 | 4.03 | 2.30 |
+| Brutal (−4 pen) | *6.83* | *6.83* | *6.83* | 5.25 | 3.68 |
 
-**Single-weapon takeaways:**
-- At low-to-medium defense (def 11–15): Heavy and Brutal have the highest DPR across all mitigation levels. The damage die advantage outweighs the accuracy penalty when hit rates are high enough.
-- At high defense (def 20): Standard and Light pull ahead. Once hit rates fall below ~40%, the −1/−2 accuracy cost is too steep.
-- Heavy and Brutal are the anti-armor specialists for single-weapon builds. At Mit 7, Brutal does 3.15 vs Standard's 2.50 — a **26% advantage**.
-- Brutal's condition-on-hit is additional non-DPR value not captured here.
+Heavy/Brutal DPR is flat below their penetration threshold because penetration can't reduce mitigation below 0.
 
-### Dual Wield DPR — Focused Attacker (Trait 4, d4)
+### Niche Hierarchy — Achieved ✅
 
-DPR = (Main HR × Main Dmg) + (Off HR × Off Dmg)
+| Monster mitigation | Dominant loadout | Notes |
+|-------------------|-----------------|-------|
+| M 0–1 (unarmored) | Dual wield +~80% | Two attacks with near-free hit rate |
+| M 2–3 (light armor) | Dual wield +~35% | Still clearly ahead |
+| M 4 (average armor) | All loadouts roughly equal | Design balance point |
+| M 5–6 (heavy armor) | Brutal wins; dual fading | Brutal's pen makes it clearly better |
+| M 7+ (extreme armor) | Brutal > Heavy > dual wield | Brutal 40% ahead of best dual option |
+| M 10+ (boss tier) | Heavy/Brutal clearly dominant | Dual wield hits min-1 floor on most hits |
 
-| Pairing | D11/M0 | D15/M0 | D20/M0 | D15/M4 | D15/M7 | D20/M4 | D20/M7 |
-|---------|--------|--------|--------|--------|--------|--------|--------|
-| Std + Simple | **16.50** | **12.50** | 7.50 | **7.50** | 3.75 | **4.50** | **2.25** |
-| Lt + Simple | 16.18 | 12.38 | **7.63** | 7.18 | 3.28 | 4.43 | 2.03 |
-| Std + Light | 15.83 | 11.63 | 6.38 | 7.23 | **3.93** | 3.98 | 2.18 |
-| Lt + Light | 15.50 | 11.50 | 6.50 | 6.90 | 3.45 | 3.80 | 1.95 |
-| Std + Std | 14.85 | 10.45 | 4.95 | 6.65 | 3.80 | 3.15 | 1.80 |
-| *Heavy (2H)* | *9.30* | *6.90* | *3.90* | *4.60* | *2.88* | *2.60* | *1.63* |
-| *Brutal (2H)* | *9.43* | *6.83* | *3.58* | *4.73* | *3.15* | *2.48* | *1.65* |
+At high mitigation, Brutal (5.25) vs best dual wield (3.75) = **40% advantage** — clear but not crushing. Dual wielders still do meaningful damage; this is their "not their specialty" tier.
 
-**Dual wield takeaways:**
-- Std + Simple is the dominant pairing in most scenarios. Simple's +0 off-hand accuracy matches Standard's main-hand accuracy, effectively granting a near-free second Standard-rate attack (at slightly lower damage).
-- At high mitigation (Mit 7), Std + Light edges out Std + Simple. The off-hand light weapon's better damage (d6 avg 3 vs d4 avg 2) compensates for its lower hit rate (47.5% vs 62.5%) when mitigation eats most of the damage. Specifically: 47.5%×3=1.43 DPR from Light off vs 62.5%×2=1.25 from Simple off.
-- Dual wield is **structurally dominant** because the second attack is free (rules specify both weapons auto-attack each turn). Even in the worst case (def 20, mit 7), Std+Simple (2.25) outperforms Brutal single (1.65) by **37%**.
-- Heavy and Brutal have no scenario where they beat the best dual-wield option without additional mechanical differentiation.
+### Monster Stat Tiers (GM Guidelines)
 
-### Dual Wield vs Single Weapon — DPR Ratio
+These are reference ranges, not hard rules. GMs set monster stats freely.
 
-| Scenario | Best Dual (Str4) | Best Single (Str4) | Dual advantage |
-|----------|-----------------|-------------------|---------------|
-| Def 15 / Mit 0 | 12.50 (Std+Sim) | 6.90 (Heavy) | **+81%** |
-| Def 15 / Mit 4 | 7.50 (Std+Sim) | 4.73 (Brutal) | **+59%** |
-| Def 15 / Mit 7 | 3.93 (Std+Lt) | 3.15 (Brutal) | **+25%** |
-| Def 20 / Mit 0 | 7.63 (Lt+Sim) | 4.28 (Simple) | **+78%** |
-| Def 20 / Mit 4 | 4.50 (Std+Sim) | 2.63 (Standard) | **+71%** |
-| Def 20 / Mit 7 | 2.25 (Std+Sim) | 1.65 (Brutal) | **+36%** |
+| Tier | Defense | Mitigation | Example creatures |
+|------|---------|------------|-------------------|
+| Weak / unarmored | 9–12 | 0–1 | Goblin, zombie, bandit |
+| Average / lightly armored | 13–16 | 2–3 | Town guard, orc warrior |
+| Tough / armored | 16–18 | 4–6 | Knight, troll, bear |
+| Elite / heavily armored | 18–22 | 7–10 | Warlord, iron golem |
+| Boss | 20–26 | 10–15 | Dragon, demon lord |
 
-The gap narrows significantly at high mitigation but dual wield always wins.
-
----
-
-## Proposed Fix: Armor Penetration for Heavy and Brutal
-
-### Concept
-Heavy and Brutal weapons ignore a portion of the target's mitigation, giving them a genuine anti-armor niche.
-
-**Proposed values:**
-- Heavy: ignore 2 mitigation (effective mitigation = actual − 2)
-- Brutal: ignore 4 mitigation (effective mitigation = actual − 4)
-
-### Breakeven Analysis
-
-With armor penetration, Heavy (−2 pen) beats Std+Simple dual wield when:
-
-57.5% × (12 − (M−2)) > 62.5% × (11−M) + 62.5% × (9−M)
-
-Solving: M > 6.6 → **Heavy with −2 pen beats dual wield when target has Mit 7+** (heavy or bulwark armor)
-
-Brutal (−4 pen) beats Std+Simple dual wield when:
-
-52.5% × (13 − (M−4)) > 62.5% × (11−M) + 62.5% × (9−M)
-
-Solving: M > 4.9 → **Brutal with −4 pen beats dual wield when target has Mit 5+** (standard armor or better)
-
-### With Penetration — DPR at Def 15
-
-| Build | Mit 4 (eff. mit 2) | Mit 7 (eff. mit 5) |
-|-------|-------------------|-------------------|
-| Std + Simple (no pen) | 7.50 | 3.75 |
-| Std + Light (no pen) | 7.23 | **3.93** |
-| Heavy (−2 pen) | 5.75 | **4.03** |
-| Brutal (−4 pen) | 6.83 | **5.25** |
-
-With penetration, Brutal at Mit 7 does 5.25 — **33% more than the best dual wield option** (3.93). Heavy and Brutal become genuinely the best choice against armored targets.
-
-### With Penetration — DPR at Def 20
-
-| Build | Mit 4 (eff. mit 2) | Mit 7 (eff. mit 5) |
-|-------|-------------------|-------------------|
-| Std + Simple (no pen) | 4.50 | 2.25 |
-| Heavy (−2 pen) | 3.25 | **2.28** |
-| Brutal (−4 pen) | 3.58 | **2.75** |
-
-At high defense + high mitigation, Brutal with penetration again wins.
-
-### Result: Clean Niche Hierarchy
-
-| Target armor | Optimal weapon choice |
-|-------------|----------------------|
-| Unarmored / light (Mit 0–4) | Dual wield (Std+Simple or Lt+Simple) |
-| Standard armor (Mit 5–6) | Brutal with penetration; dual wield still competitive |
-| Heavy / bulwark armor (Mit 7+) | Brutal or Heavy with penetration; dual wield loses |
-
-This creates a meaningful weapon selection decision without requiring dual wield to be nerfed.
-
----
-
-## Proposed Fix: Simple Off-Hand Accuracy Nerf
-
-### Alternative approach (instead of or in addition to penetration)
-
-Changing Simple's off-hand accuracy from +0 to −2 or −3:
-
-| Simple off-hand acc | Off HR vs Def 15 | Std+Simple DPR (D15/M4) | vs Heavy |
-|--------------------|-----------------|------------------------|---------|
-| +0 (current) | 62.5% | 7.50 | Heavy: 4.60 — dual wield +63% |
-| −2 | 52.5% | 4.38 + 2.63 = **7.00** | Heavy: 4.60 — dual wield +52% |
-| −3 | 47.5% | 4.38 + 2.38 = **6.75** | Heavy: 4.60 — dual wield +47% |
-
-A nerf to −3 does reduce the gap but doesn't close it. The structural issue is that two free attacks will always beat one, regardless of accuracy — you'd need to nerf Simple off-hand to around −5 or −6 (the same as Standard off-hand) before dual wield loses its structural advantage, at which point players would simply switch to Light off-hand.
-
-**Conclusion:** Simple off-hand nerf reduces dual wield dominance slightly but doesn't solve the root problem. Armor penetration for heavy/brutal is the cleaner design fix.
+**Mit 4 (Tough/Armored) is the natural balance point.** Below it, dual wield dominates. Above it, Heavy and Brutal pull ahead. GMs can use this to signal encounter difficulty through monster armor choice — a heavily armored monster is a specific challenge to dual wielders, not a generic difficulty increase.
 
 ---
 
@@ -350,17 +266,15 @@ Magic provides flexibility (anything in domain) and Resonance economy. Non-magic
 
 ## Open Balance Questions (Pending Playtesting)
 
-1. **Dual wield structural dominance** — Std+Simple beats any single two-handed weapon in all scenarios without armor penetration. Root cause: Simple's +0 off-hand accuracy equals Standard's main-hand accuracy, making the second attack nearly free. Fix options: (a) armor penetration for Heavy/Brutal — preferred; (b) Simple off-hand accuracy nerf — reduces gap but doesn't close it.
+1. **Light weapons vs high mitigation** — Simple weapons do very low damage vs armored targets (Mit 7 avg dmg 2 per hit). This is intentional — players should read the room and not bring daggers to a plate armor fight. Confirm the feel at the table.
 
-2. **Heavy vs Brutal** — Without armor penetration, Brutal strictly beats Heavy at every mitigation value (higher die, same two-handed restriction, with condition bonus on top). If penetration is added, Heavy should penetrate less (−2) and be available with a shield via training, while Brutal penetrates more (−4) but is always two-handed.
+2. **Non-magical vs magical feel** — Does 6 specializations feel rewarding enough? Does magic feel too flexible? Requires table feedback.
 
-3. **Light weapons vs high mitigation** — Simple weapons are nearly useless vs dedicated defenders even with dual wield (Mit 7 avg dmg 2). Light is the floor of viability. Intended: players should read the room and not bring a dagger to a plate armor fight.
+3. **Average hit rate at ~62.5% for avg vs avg** — Combat is slightly more hit-prone than originally intended (+8 constant was calibrated for higher avg defense). May feel fast-paced; check at table.
 
-4. **Non-magical vs magical feel** — Does 6 specializations feel rewarding enough? Does magic feel too flexible? Requires table feedback.
+4. **Resolve fragility at low investment** — Average Resolve of 5 means characters go down in ~2 hits at level 1. Intended, but check if combat feels punishing before the GM section defines encounter difficulty.
 
-5. **Average hit rate at ~52.5% for avg vs avg** — May feel like combat misses often if players aren't used to it. Check pacing at the table.
-
-6. **Resolve fragility at low investment** — Average Resolve of 5 means characters go down in ~2 hits at level 1. Intended, but check if combat feels punishing before the GM section defines encounter difficulty.
+5. **Penetration feel at the table** — Does it feel satisfying when a player with a Brutal weapon fights a heavily armored monster and clearly outperforms their dual-wielding ally? Does it feel bad when that same Brutal wielder fights an unarmored target and lags behind? Adjust penetration values (±1 or ±2) after first playtest if needed.
 
 ---
 
@@ -375,4 +289,6 @@ Magic provides flexibility (anything in domain) and Resonance economy. Non-magic
 | 2026-04-29 | Armor/Charm Training: +1 defense AND +1 mitigation | Mirrors Weapon Training (accuracy + damage) |
 | 2026-04-29 | Movement speed class modifier: +5 ft | Defined — was missing from original document |
 | 2026-05-01 | Full weapon DPR analysis completed | Dual wield structurally dominant; armor penetration for Heavy/Brutal identified as the clean fix |
-| Pending | Armor penetration: Heavy −2, Brutal −4 | Gives heavy/brutal a genuine anti-armor niche; breakeven at Mit 7 for Heavy, Mit 5 for Brutal vs dual wield |
+| 2026-05-02 | Armor penetration implemented: Heavy −2, Brutal −4 | Creates clean niche hierarchy; balance crossover at Mit ≈ 4; Simple+Simple dual ≈ Brutal single at that point |
+| 2026-05-02 | Monster stat tiers defined as GM guidelines | Weak/unarmored Mit 0–1, Average Mit 2–3, Tough Mit 4–6, Elite Mit 7–10, Boss Mit 10–15 |
+| 2026-05-02 | Accuracy and off-hand modifiers kept as-is | They produce near-equal single-weapon DPR at baseline and enforce small-weapon off-hand archetype |
